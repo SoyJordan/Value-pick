@@ -1,0 +1,9 @@
+{
+  "name":"Value Pick V1.5.2",
+  "short_name":"Value Pick",
+  "start_url":"./",
+  "display":"standalone",
+  "background_color":"#f4f6f8",
+  "theme_color":"#111827",
+  "description":"Sistema manual de análisis deportivo con modelo Poisson, valor esperado, confianza por mercado, robustez y diagnóstico."
+}
