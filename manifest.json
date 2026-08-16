@@ -1,9 +1,0 @@
-{
-  "name": "SoyJordan Picks V1.6.1",
-  "short_name": "SoyJordan Picks",
-  "start_url": "./",
-  "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#000000",
-  "description": "Análisis deportivo con bank, apuestas individuales, combinadas y seguimiento de P&L."
-}
