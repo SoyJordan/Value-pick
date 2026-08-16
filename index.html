@@ -1,0 +1,530 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<link rel="manifest" href="manifest.json">
+<title>SoyJordan Picks V1.5.8</title>
+<style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",Arial,sans-serif;color:#000;background:#000000}
+*{box-sizing:border-box}body{margin:0;padding-bottom:40px;background:#000;color:#fff}.app{max-width:900px;margin:auto;padding:14px}
+header{padding:10px 2px 8px}h1{margin:0;font-size:30px;color:#fff}h2{font-size:19px;margin:0 0 12px;color:#000}h3{font-size:16px;color:#000}
+.card{background:#fff;color:#000;border-radius:18px;padding:15px;margin:11px 0;box-shadow:0 2px 12px #00000055}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.full{grid-column:1/-1}label{font-size:12px;font-weight:700;display:block;min-width:0;color:#000}
+input,select,textarea{display:block;width:100%;max-width:100%;min-width:0;margin-top:5px;padding:11px;border:1px solid #000;border-radius:10px;font-size:16px;background:#000;color:#fff;color-scheme:dark}
+input[type=date]{width:100%;max-width:100%;min-width:0;display:block;height:44px;box-sizing:border-box;appearance:none;-webkit-appearance:none;overflow:hidden;text-overflow:clip;padding:11px 10px}input[type=date]::-webkit-date-and-time-value{text-align:left}input[type=date]::-webkit-calendar-picker-indicator{margin-left:auto}
+textarea{min-height:70px}button{border:0;border-radius:11px;padding:12px 15px;font-weight:800;font-size:15px;background:#000;color:#fff}button.secondary{background:#fff;color:#000;border:1px solid #000}.dangerBtn{background:#000;color:#fff;padding:8px 10px;font-size:13px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}.nav{display:flex;gap:7px;margin:9px 0}.nav button{flex:1}
+table{width:100%;border-collapse:collapse;font-size:12px;color:#000}td,th{padding:7px 4px;border-bottom:1px solid #0003;text-align:left;vertical-align:middle}
+.good{background:#166534}.watch{background:#854d0e}.bad{background:#991b1b}.metric{display:inline-block;background:#000;border-radius:10px;padding:7px;margin:4px 4px 0 0;font-size:12px;color:#fff}
+.muted{color:#000;opacity:.72}.small{font-size:12px}.hidden{display:none}.pill{display:inline-block;padding:5px 8px;border-radius:999px;background:#000;font-size:11px;color:#fff}
+.abs-grid,.result-grid{overflow-x:auto}.abs-grid table{min-width:720px}.result-grid table{min-width:760px}.note{background:#f2f2f2;border-left:4px solid #000;padding:9px;border-radius:8px;font-size:12px;color:#000}
+.summary{display:grid;grid-template-columns:1fr 1fr;gap:8px}.summary .box{background:#f2f2f2;border:1px solid #000;border-radius:12px;padding:10px;color:#000}.diag{background:#f2f2f2;border:1px solid #000;border-radius:12px;padding:10px;margin-top:10px;color:#000}.diag table{font-size:12px}
+.history-row{cursor:pointer}.history-row:active{background:#eee}.detail-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}.detail-section{margin-top:12px}.detail-section h3{margin:0 0 8px}.draft-badge{display:inline-block;margin-top:6px;padding:5px 8px;border-radius:999px;background:#fff;color:#000;border:1px solid #fff;font-size:11px;font-weight:700}
+@media(max-width:560px){.grid{grid-template-columns:1fr}.grid label input[type=date]{width:100%;max-width:100%;height:44px}.full{grid-column:auto}.summary{grid-template-columns:1fr}.app{padding:12px}.card{padding:13px}input,select,textarea{font-size:16px}}
+</style>
+</head>
+<body>
+<main class="app">
+<header>
+<h1>⚽ SoyJordan Picks</h1>
+<div class="muted">V1.5.8 · local · manual · sin APIs</div>
+</header>
+
+<div class="nav">
+<button onclick="show('analysis')">Nuevo análisis</button>
+<button class="secondary" onclick="show('history')">Historial</button>
+<button class="secondary" onclick="show('backup')">Datos</button>
+</div>
+
+<section id="analysis">
+<div id="draftStatus" class="draft-badge">💾 Borrador automático activo</div>
+<form id="form">
+<div class="card">
+<h2>Partido</h2>
+<div class="grid">
+<label>Fecha<input id="date" type="date" required></label>
+<label>Liga<input id="league" required></label>
+<label>Temporada<input id="season" value="2026/27"></label>
+<label>Promedio goles liga por equipo/partido<input id="leagueAvg" type="number" step=".01" value="1.35"></label>
+<label>Local<input id="home" required></label>
+<label>Visitante<input id="away" required></label>
+<label class="full">Notas<textarea id="notes" placeholder="Contexto objetivo, fuentes, etc."></textarea></label>
+</div>
+<div class="note" style="margin-top:10px">
+<b>V1.5.8:</b> GF, GA, xG y xGA se introducen como <b>totales del período</b>. El sistema los convierte a promedios por partido usando los partidos de muestra. Esto evita tratar, por ejemplo, 51 xG de una temporada como si fueran 51 xG por partido.
+</div>
+</div>
+
+<div id="teamCards"></div>
+
+<div class="card">
+<h2>🩹 Ausencias con impacto</h2>
+<div class="note">
+La escala 0–100 mide la importancia relativa del jugador, no el porcentaje de goles que desaparece. Una baja confirmada pesa 100%; una duda pesa 50%. En V1.5 el impacto máximo sobre λ ofensivo/defensivo está limitado para evitar que una sola ausencia destruya el modelo.
+</div>
+<div id="absenceCards"></div>
+</div>
+
+<div class="card">
+<h2>💰 Cuotas</h2>
+<p class="small muted">Introduce solo las cuotas disponibles. El modelo compara probabilidad propia contra la cuota indicada.</p>
+<div id="odds"></div>
+</div>
+
+<button type="submit" style="width:100%">ANALIZAR Y GUARDAR</button><button type="button" class="secondary" style="width:100%;margin-top:8px" onclick="clearCurrentForm()">🧹 Limpiar datos</button>
+</form>
+<div id="result"></div>
+</section>
+
+<section id="history" class="hidden">
+<div id="historyList" class="card"><h2>📚 Historial</h2><div id="stats"></div><p class="small muted">Toca un partido para ver todos los datos guardados y el resultado completo.</p><div id="historyTable"></div></div>
+<div id="historyDetail" class="hidden"></div>
+</section>
+
+<section id="backup" class="hidden">
+<div class="card">
+<h2>💾 Datos</h2>
+<p>El historial permanece en este iPhone mediante almacenamiento local. V1.5 conserva el formato de registros de V1.4 y permite exportar/importar backups.</p>
+<div class="actions">
+<button onclick="exportData()">Exportar backup</button>
+<label style="display:inline-block">
+<input id="importFile" type="file" accept=".json" onchange="importData(event)" style="display:none">
+<button type="button" class="secondary" onclick="document.getElementById('importFile').click()">Importar backup</button>
+</label>
+<button class="secondary" onclick="clearAll()">Borrar datos</button>
+</div>
+<p id="dataMsg" class="small"></p>
+</div>
+</section>
+</main>
+
+<script>
+const periods=[["season","Temporada",38],["last10","Últimos 10",10],["last5","Últimos 5",5]];
+const metrics=[
+["gf","GF"],["ga","GA"],["xg","xG"],["xga","xGA"],
+["shots","Tiros"],["sot","Tiros al arco"],["sa","Tiros recibidos"],
+["sota","Tiros al arco recibidos"],["bc","Ocasiones claras"],
+["bca","Ocasiones concedidas"],["rest","Días descanso"]
+];
+const markets=[
+["1X2","home","Local"],["1X2","draw","Empate"],["1X2","away","Visitante"],
+["TOTAL","over15","Over 1.5"],["TOTAL","under15","Under 1.5"],
+["TOTAL","over25","Over 2.5"],["TOTAL","under25","Under 2.5"],
+["TOTAL","over35","Over 3.5"],["TOTAL","under35","Under 3.5"],
+["BTTS","bttsYes","BTTS Sí"],["BTTS","bttsNo","BTTS No"],
+["DNB","homeDnb","Local DNB"],["DNB","awayDnb","Visitante DNB"],
+["TEAM","home05","Local Over 0.5"],["TEAM","home15","Local Over 1.5"],
+["TEAM","away05","Visitante Over 0.5"],["TEAM","away15","Visitante Over 1.5"],
+["AH","home05plus","Local +0.5"],["AH","away05plus","Visitante +0.5"]
+];
+
+function build(){
+let tc=document.getElementById("teamCards"); tc.innerHTML="";
+for(const [side,title] of [["home","🏠 Local"],["away","✈️ Visitante"]]){
+let h=`<div class="card"><h2>${title}</h2><table><tr><th>Métrica</th>${periods.map(p=>`<th>${p[1]}<br><span class="muted">n=${p[2]}</span></th>`).join("")}</tr>`;
+for(const [k,l] of metrics){
+h+=`<tr><td>${l}</td>${periods.map(p=>`<td><input data-team="${side}" data-period="${p[0]}" data-key="${k}" type="number" step=".01"></td>`).join("")}</tr>`;
+}
+h+="</table><p class=\"small muted\">Los campos de GF/GA/xG/xGA y volumen de juego son totales del período. Los días de descanso se interpretan como valor del partido.</p></div>";
+tc.innerHTML+=h;
+}
+document.getElementById("odds").innerHTML=markets.map(x=>`<div class="grid" style="margin:6px 0"><label class="full">${x[0]} · ${x[2]}<input data-odd="${x[1]}" type="number" min="1.01" step=".01" placeholder="Cuota"></label></div>`).join("");
+renderAbsenceCards();
+}
+build();
+document.getElementById("date").value=new Date().toISOString().slice(0,10);
+
+function renderAbsenceCards(){
+const wrap=document.getElementById("absenceCards"); wrap.innerHTML="";
+for(const [side,title] of [["home","🏠 Local"],["away","✈️ Visitante"]]){
+const id=side+"Abs";
+wrap.innerHTML+=`
+<div class="card" style="box-shadow:none;background:#fff">
+<h3 style="margin:0 0 8px">${title}</h3>
+<div class="abs-grid"><table id="${id}">
+<thead><tr><th>Jugador</th><th>Estado</th><th>Imp. ataque 0–100</th><th>Imp. defensa 0–100</th><th>Impacto ataque</th><th>Impacto defensa</th><th></th></tr></thead>
+<tbody></tbody></table></div>
+<div class="actions" style="margin-top:8px"><button type="button" onclick="addAbsence('${side}')">+ Añadir jugador</button></div>
+<div id="${side}AbsSummary" class="small muted" style="margin-top:7px"></div>
+</div>`;
+addAbsence(side);
+}
+}
+function addAbsence(side){
+const tbody=document.querySelector(`#${side}Abs tbody`),tr=document.createElement("tr");
+tr.innerHTML=`<td><input class="abs-name" placeholder="Nombre"></td>
+<td><select class="abs-status"><option value="confirmed">Baja confirmada</option><option value="doubt">Duda</option><option value="available">Disponible</option></select></td>
+<td><input class="abs-att" type="number" min="0" max="100" step="1" value="0"></td>
+<td><input class="abs-def" type="number" min="0" max="100" step="1" value="0"></td>
+<td class="abs-att-impact">0</td><td class="abs-def-impact">0</td>
+<td><button type="button" class="dangerBtn" onclick="this.closest('tr').remove();updateAbsSummary('${side}')">×</button></td>`;
+tbody.appendChild(tr);tr.querySelectorAll("input,select").forEach(el=>el.addEventListener("input",()=>updateAbsSummary(side)));updateAbsSummary(side);
+}
+function statusMultiplier(status){return status==="confirmed"?1:status==="doubt"?.5:0}
+function getAbsences(side){
+return [...document.querySelectorAll(`#${side}Abs tbody tr`)].map(tr=>{
+const status=tr.querySelector(".abs-status").value,m=statusMultiplier(status);
+const att=Math.max(0,Math.min(100,+tr.querySelector(".abs-att").value||0))*m;
+const def=Math.max(0,Math.min(100,+tr.querySelector(".abs-def").value||0))*m;
+tr.querySelector(".abs-att-impact").textContent=att.toFixed(0);tr.querySelector(".abs-def-impact").textContent=def.toFixed(0);
+return {name:tr.querySelector(".abs-name").value,status,att,def};
+});
+}
+function cappedImpact(arr,key){return Math.min(100,arr.reduce((s,x)=>s+x[key],0))}
+function updateAbsSummary(side){
+const arr=getAbsences(side),att=cappedImpact(arr,"att"),def=cappedImpact(arr,"def");
+document.getElementById(side+"AbsSummary").innerHTML=`Impacto ofensivo: <b>${att.toFixed(0)}/100</b> · Impacto defensivo: <b>${def.toFixed(0)}/100</b>`;
+}
+function getTeam(side){
+let d={}; for(const p of periods){d[p[0]]={};for(const [k] of metrics){
+let el=document.querySelector(`[data-team="${side}"][data-period="${p[0]}"][data-key="${k}"]`);
+d[p[0]][k]=el.value===""?null:+el.value;
+}} return d;
+}
+function perMatch(d,period,k){
+const v=d?.[period]?.[k]; if(v==null)return null;
+const n=periods.find(x=>x[0]===period)?.[2]||1;
+return v/n;
+}
+function weightedPerMatch(d,k){
+let arr=periods.map(p=>[p[0],p[2],d?.[p[0]]?.[k]]).filter(x=>x[2]!=null);
+if(!arr.length)return null;
+const weights={season:.5,last10:.3,last5:.2};
+let ws=arr.reduce((s,x)=>s+(weights[x[0]]||0),0);
+return arr.reduce((s,x)=>s+(weights[x[0]]||0)/ws*(x[2]/x[1]),0);
+}
+function weightedRest(d){
+let arr=periods.map(p=>[p[0],d?.[p[0]]?.rest]).filter(x=>x[1]!=null),weights={season:.5,last10:.3,last5:.2};
+if(!arr.length)return 7;let ws=arr.reduce((s,x)=>s+(weights[x[0]]||0),0);
+return arr.reduce((s,x)=>s+(weights[x[0]]||0)/ws*x[1],0);
+}
+function shrink(raw,alpha=.65){return 1+alpha*(raw-1)}
+function clamp(x,a,b){return Math.max(a,Math.min(b,x))}
+function expGoals(h,a,avg,absH,absA){
+const hXG=weightedPerMatch(h,"xg"),hGF=weightedPerMatch(h,"gf"),hXGA=weightedPerMatch(h,"xga"),hGA=weightedPerMatch(h,"ga");
+const aXG=weightedPerMatch(a,"xg"),aGF=weightedPerMatch(a,"gf"),aXGA=weightedPerMatch(a,"xga"),aGA=weightedPerMatch(a,"ga");
+function attack(xg,gf){let vals=[xg,gf].filter(v=>v!=null);if(!vals.length)return {raw:1,shrunk:1,source:"default"};let raw=vals.length===2?.7*(vals[0]/avg)+.3*(vals[1]/avg):vals[0]/avg;return {raw,shrunk:shrink(raw),source:vals.length===2?"70% xG / 30% GF":"available metric"}}
+function defense(xga,ga){let vals=[xga,ga].filter(v=>v!=null);if(!vals.length)return {raw:1,shrunk:1,source:"default"};let raw=vals.length===2?.7*(vals[0]/avg)+.3*(vals[1]/avg):vals[0]/avg;return {raw,shrunk:shrink(raw),source:vals.length===2?"70% xGA / 30% GA":"available metric"}}
+const Hatt=attack(hXG,hGF),Aatt=attack(aXG,aGF),Hdef=defense(hXGA,hGA),Adef=defense(aXGA,aGA);
+const restH=weightedRest(h),restA=weightedRest(a);
+const homeVenue=1.08,awayVenue=.96;
+const restHF=1+clamp(restH-7,-3,3)*.01,restAF=1+clamp(restA-7,-3,3)*.01;
+const absenceHAtt=1-.10*(absH.att/100),absenceAAtt=1-.10*(absA.att/100);
+const absenceHDef=1+.10*(absH.def/100),absenceADef=1+.10*(absA.def/100);
+const baseH=avg*Hatt.shrunk*Adef.shrunk*homeVenue;
+const baseA=avg*Aatt.shrunk*Hdef.shrunk*awayVenue;
+const finalH=clamp(baseH*absenceHAtt*absenceADef*restHF,.20,3.50);
+const finalA=clamp(baseA*absenceAAtt*absenceHDef*restAF,.20,3.50);
+return {hl:finalH,al:finalA,diag:{Hatt,Aatt,Hdef,Adef,restH,restA,homeVenue,awayVenue,restHF,restAF,absenceHAtt,absenceAAtt,absenceHDef,absenceADef,baseH,baseA}};
+}
+function pois(k,l){return Math.exp(-l)*Math.pow(l,k)/factorial(k)}
+function factorial(n){let r=1;for(let i=2;i<=n;i++)r*=i;return r}
+function probs(hl,al){
+let m=[];for(let h=0;h<=10;h++)for(let a=0;a<=10;a++)m.push([h,a,pois(h,hl)*pois(a,al)]);
+let p={home:0,draw:0,away:0,bttsYes:0};
+m.forEach(([h,a,v])=>{if(h>a)p.home+=v;else if(h===a)p.draw+=v;else p.away+=v;if(h&&a)p.bttsYes+=v});
+p.bttsNo=1-p.bttsYes;
+for(let [k,t] of [["15",2],["25",3],["35",4]]){p["over"+k]=m.filter(x=>x[0]+x[1]>=t).reduce((s,x)=>s+x[2],0);p["under"+k]=1-p["over"+k]}
+let nd=1-p.draw;p.homeDnb=p.home/nd;p.awayDnb=p.away/nd;
+p.home05=1-pois(0,hl);p.home15=1-(pois(0,hl)+pois(1,hl));
+p.away05=1-pois(0,al);p.away15=1-(pois(0,al)+pois(1,al));
+p.home05plus=p.home+p.draw;p.away05plus=p.away+p.draw;return p;
+}
+function score(p,o,metrics){
+let imp=1/o,ed=p-imp,e=p*o-1;
+let vs=clamp(50+180*e+70*ed,0,100);
+const robustness=metrics.robustness;
+const dataConf=metrics.dataConf;
+const certainty=50+50*Math.abs(2*p-1);
+const edgeStrength=clamp(Math.abs(ed)/.15*100,0,100);
+const conf=clamp(.50*dataConf+.25*robustness+.15*certainty+.10*edgeStrength,25,95);
+let dec=e>=.07&&ed>=.03&&conf>=65&&robustness>=55?"VALUE BET":(e>=.03&&ed>=.02&&conf>=50&&robustness>=45?"WATCH":"NO BET");
+return {p,imp,fair:1/p,ed,e,vs,conf,robustness,worstEV:metrics.worstEV,bestEV:metrics.bestEV,baseEV:e,dec};
+}
+function confidenceScore(h,a,absH,absA){
+let relevant=["gf","ga","xg","xga","shots","sot","sa","sota","bc","bca","rest"],count=0,total=0;
+for(const side of [h,a])for(const p of periods)for(const k of relevant){total++;if(side?.[p[0]]?.[k]!=null)count++}
+const completeness=total?count/total:0;
+const xgPair=([h,a].filter(t=>t.season?.xg!=null&&t.season?.xga!=null).length/2);
+const recent=([h,a].filter(t=>t.last10?.xg!=null&&t.last10?.xga!=null&&t.last5?.xg!=null&&t.last5?.xga!=null).length/2);
+const absenceKnown=([absH,absA].filter(x=>x.length>0).length/2);
+function consistency(t){
+ const pairs=[["xg","gf"],["xga","ga"]].map(([x,g])=>{
+   const xv=weightedPerMatch(t,x),gv=weightedPerMatch(t,g);
+   if(xv==null||gv==null||xv<=0)return null;
+   return Math.abs(gv-xv)/xv;
+ }).filter(v=>v!=null);
+ if(!pairs.length)return .5;
+ const avgDiff=pairs.reduce((s,v)=>s+v,0)/pairs.length;
+ return clamp(1-avgDiff,0,1);
+}
+const consistencyAvg=(consistency(h)+consistency(a))/2;
+return clamp(35+25*completeness+12*xgPair+8*recent+5*absenceKnown+15*consistencyAvg,25,95);
+}
+function marketSensitivity(key,odds,hl,al){
+  const factors=[.93,1.07];
+  let evs=[];
+  for(const fh of factors) for(const fa of factors){
+    const pp=probs(hl*fh,al*fa)[key];
+    evs.push(pp*odds-1);
+  }
+  const worst=Math.min(...evs),best=Math.max(...evs),range=best-worst;
+  const robustness=clamp(100-350*range,0,100);
+  return {worstEV:worst,bestEV:best,robustness};
+}
+function marketLabel(key){const m=markets.find(x=>x[1]===key);return m?m[2]:key}
+function loadDB(){return JSON.parse(localStorage.getItem("valuePickDB")||"[]")}
+function saveDB(x){localStorage.setItem("valuePickDB",JSON.stringify(x))}
+const DRAFT_KEY="valuePickDraftV1_5_6";
+let draftTimer=null;
+let editingRecordId=null;
+function collectFormState(){
+  return {
+    date:document.getElementById("date")?.value||"", league:document.getElementById("league")?.value||"",
+    season:document.getElementById("season")?.value||"", leagueAvg:document.getElementById("leagueAvg")?.value||"",
+    home:document.getElementById("home")?.value||"", away:document.getElementById("away")?.value||"",
+    notes:document.getElementById("notes")?.value||"", teams:{home:getTeam("home"),away:getTeam("away")},
+    absences:{home:getAbsences("home"),away:getAbsences("away")},
+    odds:Object.fromEntries([...document.querySelectorAll("[data-odd]")].map(el=>[el.dataset.odd,el.value]))
+  };
+}
+function saveDraftNow(){try{localStorage.setItem(DRAFT_KEY,JSON.stringify(collectFormState()));setDraftStatus("💾 Borrador guardado automáticamente")}catch(e){}}
+function queueDraftSave(){clearTimeout(draftTimer);draftTimer=setTimeout(saveDraftNow,120)}
+function setDraftStatus(text){let el=document.getElementById("draftStatus");if(el)el.textContent=text}
+function hasDraft(){try{const d=JSON.parse(localStorage.getItem(DRAFT_KEY)||"null");return !!d && !!(d.home||d.away||d.league||d.notes||Object.values(d.odds||{}).some(Boolean))}catch(e){return false}}
+function restoreDraft(){
+  try{
+    const d=JSON.parse(localStorage.getItem(DRAFT_KEY)||"null"); if(!d)return;
+    const set=(id,v)=>{const el=document.getElementById(id);if(el&&v!==undefined)el.value=v||""};
+    ["date","league","season","leagueAvg","home","away","notes"].forEach(k=>set(k,d[k]));
+    if(d.teams){for(const side of ["home","away"])for(const p of periods){for(const [k] of metrics){const el=document.querySelector(`[data-team="${side}"][data-period="${p[0]}"][data-key="${k}"]`);if(el&&d.teams[side]?.[p[0]]?.[k]!=null)el.value=d.teams[side][p[0]][k];}}}
+    if(d.absences){for(const side of ["home","away"]){const rows=d.absences[side]||[];const tbody=document.querySelector(`#${side}Abs tbody`);if(tbody){tbody.innerHTML="";if(rows.length){rows.forEach(r=>{addAbsence(side);const tr=tbody.lastElementChild;tr.querySelector(".abs-name").value=r.name||"";tr.querySelector(".abs-status").value=r.status||"confirmed";tr.querySelector(".abs-att").value=r.att||0;tr.querySelector(".abs-def").value=r.def||0;});}else addAbsence(side);updateAbsSummary(side);}}}
+    if(d.odds)Object.entries(d.odds).forEach(([k,v])=>{const el=document.querySelector(`[data-odd="${k}"]`);if(el)el.value=v||""});
+    setDraftStatus("💾 Borrador recuperado automáticamente");
+  }catch(e){console.warn("No se pudo recuperar borrador",e)}
+}
+function clearDraft(){localStorage.removeItem(DRAFT_KEY);setDraftStatus("Borrador eliminado")}
+function resetFormToBlank(){document.getElementById("form").reset();document.getElementById("date").value=new Date().toISOString().slice(0,10);document.getElementById("leagueAvg").value="1.35";renderAbsenceCards();clearDraft();setDraftStatus("Nuevo análisis listo")}
+
+document.getElementById("form").addEventListener("submit",e=>{
+e.preventDefault();
+const oddsValues=Object.fromEntries([...document.querySelectorAll("[data-odd]")].map(el=>[el.dataset.odd,el.value]));
+if(!Object.values(oddsValues).some(Boolean)){alert("Introduce al menos una cuota antes de analizar y guardar.");return;}
+let home=document.getElementById("home").value,away=document.getElementById("away").value,hd=getTeam("home"),ad=getTeam("away");
+let absH=getAbsences("home"),absA=getAbsences("away"),absHS={att:cappedImpact(absH,"att"),def:cappedImpact(absH,"def")},absAS={att:cappedImpact(absA,"att"),def:cappedImpact(absA,"def")};
+let eg=expGoals(hd,ad,+document.getElementById("leagueAvg").value||1.35,absHS,absAS),hl=eg.hl,al=eg.al,ps=probs(hl,al),dataConf=confidenceScore(hd,ad,absH,absA),rows=[];
+document.querySelectorAll("[data-odd]").forEach(el=>{if(el.value&&ps[el.dataset.odd]!=null){let odds=+el.value,sm=marketSensitivity(el.dataset.odd,odds,hl,al),s=score(ps[el.dataset.odd],odds,{...sm,dataConf});rows.push({...s,market:el.dataset.odd,odds})}});
+rows.sort((a,b)=>b.vs-a.vs);
+let rec={id:editingRecordId||Date.now(),date:document.getElementById("date").value,league:document.getElementById("league").value,season:document.getElementById("season").value,leagueAvg:+document.getElementById("leagueAvg").value||1.35,home,away,hl,al,rows,result:null,notes:document.getElementById("notes").value,absenceImpact:{home:absHS,away:absAS},absences:{home:absH,away:absA},teams:{home:hd,away:ad},odds:oddsValues,diagnostics:eg.diag,dataConfidence:dataConf,version:"1.5.6"};
+let db=loadDB();
+if(editingRecordId){const idx=db.findIndex(x=>x.id===editingRecordId);if(idx>=0)db[idx]=rec;else db.unshift(rec);}else db.unshift(rec);
+saveDB(db);editingRecordId=null;clearDraft();renderResult(rec);resetFormToBlank();show("analysis");
+});
+function renderResult(r){
+let d=r.diagnostics;
+let h=`<div class="card"><h2>🎯 Resultado V1.5.8</h2>
+<div class="summary">
+<div class="box"><b>${r.home}</b><br>λ goles: <b>${r.hl.toFixed(2)}</b><br>Ausencia ataque: ${r.absenceImpact.home.att.toFixed(0)}/100<br>Ausencia defensa: ${r.absenceImpact.home.def.toFixed(0)}/100</div>
+<div class="box"><b>${r.away}</b><br>λ goles: <b>${r.al.toFixed(2)}</b><br>Ausencia ataque: ${r.absenceImpact.away.att.toFixed(0)}/100<br>Ausencia defensa: ${r.absenceImpact.away.def.toFixed(0)}/100</div>
+</div>
+<p class="small muted">Confianza de datos: <b>${r.dataConfidence.toFixed(0)}/95</b>. Esta métrica evalúa completitud, muestras recientes y consistencia xG/GF; no equivale a probabilidad de acierto.</p>
+<div class="diag"><b>🔎 Diagnóstico del λ</b><table>
+<tr><th>Componente</th><th>Local</th><th>Visitante</th></tr>
+<tr><td>Ataque bruto</td><td>${d.Hatt.raw.toFixed(2)}</td><td>${d.Aatt.raw.toFixed(2)}</td></tr>
+<tr><td>Ataque ajustado</td><td>${d.Hatt.shrunk.toFixed(2)}</td><td>${d.Aatt.shrunk.toFixed(2)}</td></tr>
+<tr><td>Debilidad defensiva bruta</td><td>${d.Hdef.raw.toFixed(2)}</td><td>${d.Adef.raw.toFixed(2)}</td></tr>
+<tr><td>Debilidad defensiva ajustada</td><td>${d.Hdef.shrunk.toFixed(2)}</td><td>${d.Adef.shrunk.toFixed(2)}</td></tr>
+<tr><td>Base λ antes de ausencias/descanso</td><td>${d.baseH.toFixed(2)}</td><td>${d.baseA.toFixed(2)}</td></tr>
+<tr><td>Ajuste ataque por ausencias</td><td>${d.absenceHAtt.toFixed(3)}</td><td>${d.absenceAAtt.toFixed(3)}</td></tr>
+<tr><td>Ajuste defensa rival por ausencias</td><td>${d.absenceADef.toFixed(3)}</td><td>${d.absenceHDef.toFixed(3)}</td></tr>
+<tr><td>Ajuste descanso</td><td>${d.restHF.toFixed(3)}</td><td>${d.restAF.toFixed(3)}</td></tr>
+<tr><td><b>λ final</b></td><td><b>${r.hl.toFixed(2)}</b></td><td><b>${r.al.toFixed(2)}</b></td></tr>
+</table></div>
+<p class="small muted">El modelo V1.5.8 usa 70% xG/xGA y 30% GF/GA cuando están disponibles, convierte totales a promedios por partido, aplica regresión hacia 1, localía, descanso y ajustes limitados por ausencias.</p>
+<div class="note" style="margin-top:10px"><b>Conf.</b> = confianza del modelo para ese mercado, separada del valor de la apuesta. <b>Robustez</b> = estabilidad del EV cuando λ local y visitante varían ±7%. <b>EV peor</b> = peor EV en esas cuatro combinaciones.</div><div class="result-grid"><table><tr><th>Pick</th><th>Prob.</th><th>Justa</th><th>Cuota</th><th>Edge</th><th>EV</th><th>Value</th><th>Conf.</th><th>Robustez</th><th>EV peor</th><th></th></tr>`;
+for(let x of r.rows)h+=`<tr class="${x.dec==='VALUE BET'?'good':x.dec==='WATCH'?'watch':'bad'}"><td>${marketLabel(x.market)}</td><td>${(x.p*100).toFixed(1)}%</td><td>${x.fair.toFixed(2)}</td><td>${x.odds.toFixed(2)}</td><td>${(x.ed*100).toFixed(1)}%</td><td>${(x.e*100).toFixed(1)}%</td><td>${x.vs.toFixed(0)}</td><td>${x.conf.toFixed(0)}</td><td>${x.robustness.toFixed(0)}</td><td>${(x.worstEV*100).toFixed(1)}%</td><td><b>${x.dec}</b></td></tr>`;
+h+="</table></div></div>";document.getElementById("result").innerHTML=h;
+}
+function show(id){["analysis","history","backup"].forEach(x=>document.getElementById(x).classList.toggle("hidden",x!==id));if(id==="history")renderHistory()}
+function renderHistory(){
+let db=loadDB(),settled=db.filter(x=>x.result),wins=settled.filter(x=>x.result==="win").length,loss=settled.filter(x=>x.result==="loss").length,pnl=settled.reduce((s,x)=>s+(x.pnl||0),0),stake=settled.length;
+document.getElementById("stats").innerHTML=`<span class="metric">Análisis: ${db.length}</span><span class="metric">Liquidados: ${settled.length}</span><span class="metric">Aciertos: ${wins}</span><span class="metric">Fallos: ${loss}</span><span class="metric">PnL: ${pnl.toFixed(2)}u</span><span class="metric">ROI: ${stake?(pnl/stake*100).toFixed(2):"0.00"}%</span>`;
+let h="<table><tr><th>Fecha</th><th>Partido</th><th>Mejor pick</th><th>Cuota</th><th>EV</th><th>Estado</th><th></th></tr>";
+db.forEach(r=>{let x=r.rows&&r.rows[0];h+=`<tr class="history-row" onclick="openHistoryDetail(${r.id})"><td>${r.date}</td><td><b>${r.home}</b> vs <b>${r.away}</b></td><td>${x?marketLabel(x.market):"-"}</td><td>${x?x.odds.toFixed(2):"-"}</td><td>${x?(x.e*100).toFixed(1)+"%":"-"}</td><td>${r.result||"Pendiente"}</td><td><button type="button" class="dangerBtn" onclick="event.stopPropagation();deleteRecord(${r.id})">🗑️</button> ${x?`<button type="button" onclick="event.stopPropagation();settle(${r.id})">Liquidar</button>`:""}</td></tr>`});
+h+="</table>";document.getElementById("historyTable").innerHTML=h||"<p class='muted'>Todavía no hay análisis guardados.</p>";
+}
+function fmt(v){return v==null||v===""?"—":(typeof v==="number"?v.toFixed(2):v)}
+function teamDetailTable(t){let h='<table><tr><th>Métrica</th><th>Temporada</th><th>Últimos 10</th><th>Últimos 5</th></tr>';for(const [k,l] of metrics)h+=`<tr><td>${l}</td><td>${fmt(t?.season?.[k])}</td><td>${fmt(t?.last10?.[k])}</td><td>${fmt(t?.last5?.[k])}</td></tr>`;return h+'</table>'}
+function absDetail(arr){if(!arr?.length)return '<p class="muted">Sin ausencias registradas.</p>';let h='<table><tr><th>Jugador</th><th>Estado</th><th>Ataque</th><th>Defensa</th></tr>';arr.forEach(x=>h+=`<tr><td>${x.name||'—'}</td><td>${x.status==='confirmed'?'Confirmada':x.status==='doubt'?'Duda':'Disponible'}</td><td>${fmt(x.att)}</td><td>${fmt(x.def)}</td></tr>`);return h+'</table>'}
+function oddsDetail(r){let h='<table><tr><th>Mercado</th><th>Cuota</th><th>Prob.</th><th>EV</th><th>Decisión</th></tr>';(r.rows||[]).forEach(x=>h+=`<tr class="${x.dec==='VALUE BET'?'good':x.dec==='WATCH'?'watch':'bad'}"><td>${marketLabel(x.market)}</td><td>${x.odds.toFixed(2)}</td><td>${(x.p*100).toFixed(1)}%</td><td>${(x.e*100).toFixed(1)}%</td><td>${x.dec}</td></tr>`);return h+'</table>'}
+function openHistoryDetail(id){
+ const r=loadDB().find(x=>x.id===id);if(!r)return;
+ document.getElementById('historyList').classList.add('hidden');const box=document.getElementById('historyDetail');box.classList.remove('hidden');
+ const d=r.diagnostics||{};
+ box.innerHTML=`<div class="card"><div class="detail-head"><div><h2 style="margin:0">📊 ${r.home} vs ${r.away}</h2><div class="muted">${r.date} · ${r.league||''} · ${r.season||''}</div></div><button class="secondary" onclick="closeHistoryDetail()">← Volver al historial</button></div>
+ <div class="detail-section"><h3>Resultado del modelo</h3><div class="summary"><div class="box"><b>${r.home}</b><br>λ: <b>${r.hl.toFixed(2)}</b><br>Ausencia ataque: ${r.absenceImpact?.home?.att?.toFixed(0)||0}/100<br>Ausencia defensa: ${r.absenceImpact?.home?.def?.toFixed(0)||0}/100</div><div class="box"><b>${r.away}</b><br>λ: <b>${r.al.toFixed(2)}</b><br>Ausencia ataque: ${r.absenceImpact?.away?.att?.toFixed(0)||0}/100<br>Ausencia defensa: ${r.absenceImpact?.away?.def?.toFixed(0)||0}/100</div></div><p class="small muted">Confianza de datos: <b>${(r.dataConfidence||0).toFixed(0)}/95</b></p></div>
+ <div class="detail-section"><h3>📋 Datos guardados — ${r.home}</h3>${teamDetailTable(r.teams?.home)}</div>
+ <div class="detail-section"><h3>📋 Datos guardados — ${r.away}</h3>${teamDetailTable(r.teams?.away)}</div>
+ <div class="detail-section"><h3>🩹 Ausencias</h3><b>${r.home}</b>${absDetail(r.absences?.home)}<b>${r.away}</b>${absDetail(r.absences?.away)}</div>
+ <div class="detail-section"><h3>🔎 Diagnóstico</h3><table><tr><th>Componente</th><th>${r.home}</th><th>${r.away}</th></tr><tr><td>Ataque bruto</td><td>${fmt(d.Hatt?.raw)}</td><td>${fmt(d.Aatt?.raw)}</td></tr><tr><td>Ataque ajustado</td><td>${fmt(d.Hatt?.shrunk)}</td><td>${fmt(d.Aatt?.shrunk)}</td></tr><tr><td>Defensa bruta</td><td>${fmt(d.Hdef?.raw)}</td><td>${fmt(d.Adef?.raw)}</td></tr><tr><td>Defensa ajustada</td><td>${fmt(d.Hdef?.shrunk)}</td><td>${fmt(d.Adef?.shrunk)}</td></tr><tr><td>Base λ</td><td>${fmt(d.baseH)}</td><td>${fmt(d.baseA)}</td></tr><tr><td>λ final</td><td><b>${r.hl.toFixed(2)}</b></td><td><b>${r.al.toFixed(2)}</b></td></tr></table></div>
+ <div class="detail-section"><h3>💰 Cuotas y mercados</h3>${oddsDetail(r)}</div>
+ <div class="detail-section"><h3>📝 Notas</h3><div class="note">${r.notes||'Sin notas.'}</div></div>
+ <div class="actions" style="margin-top:12px"><button type="button" onclick="loadRecordIntoForm(${r.id})">✏️ Cargar en formulario</button>${r.rows?.length?`<button type="button" class="secondary" onclick="settle(${r.id})">Liquidar pick principal</button>`:''}<button type="button" class="dangerBtn" onclick="deleteRecord(${r.id})">🗑️ Borrar este partido</button></div>
+ </div>`;
+}
+function closeHistoryDetail(){document.getElementById('historyDetail').classList.add('hidden');document.getElementById('historyList').classList.remove('hidden')}
+function loadRecordIntoForm(id){
+ const r=loadDB().find(x=>x.id===id);if(!r)return;
+ editingRecordId=r.id;
+ const savedOdds=r.odds||Object.fromEntries((r.rows||[]).map(x=>[x.market,x.odds]));
+ const d={date:r.date,league:r.league,season:r.season,leagueAvg:r.leagueAvg||'',home:r.home,away:r.away,notes:r.notes||'',teams:r.teams,absences:r.absences,odds:savedOdds};
+ localStorage.setItem(DRAFT_KEY,JSON.stringify(d));
+ document.getElementById('result').innerHTML='';
+ closeHistoryDetail();show('analysis');restoreDraft();setDraftStatus('✏️ Análisis cargado: cuotas y datos recuperados. Puedes editar y volver a analizar.');
+}
+function settle(id){let db=loadDB(),r=db.find(x=>x.id===id);if(!r||!r.rows||!r.rows.length)return;let x=r.rows[0],res=prompt("Resultado: WIN, LOSS o PUSH","WIN");if(!res)return;res=res.toLowerCase();if(!["win","loss","push"].includes(res))return alert("Resultado inválido");r.result=res;r.pnl=res==="win"?x.odds-1:res==="loss"?-1:0;saveDB(db);renderHistory();openHistoryDetail(id)}
+function deleteRecord(id){const db=loadDB(),r=db.find(x=>x.id===id);if(!r)return;if(!confirm(`¿Borrar del historial "${r.home} vs ${r.away}"?\n\nEsta acción no se puede deshacer.`))return;saveDB(db.filter(x=>x.id!==id));closeHistoryDetail();renderHistory()}
+function clearCurrentForm(){if(confirm("¿Limpiar todos los datos del formulario?")){resetFormToBlank();document.getElementById("result").innerHTML="";editingRecordId=null}}
+function exportData(){let b=new Blob([JSON.stringify(loadDB(),null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="SoyJordan_Picks_V1_5_8_Backup.json";a.click();document.getElementById("dataMsg").textContent="Backup V1.5.8 exportado."}
+function importData(e){let f=e.target.files[0];if(!f)return;let rd=new FileReader();rd.onload=()=>{try{let incoming=JSON.parse(rd.result);if(!Array.isArray(incoming))throw Error();const current=loadDB();const byId=new Map(current.map(x=>[String(x.id),x]));let added=0,updated=0;incoming.forEach(x=>{if(!x||x.id==null)return;const key=String(x.id);if(byId.has(key))updated++;else added++;byId.set(key,x)});const merged=[...byId.values()].sort((a,b)=>(Number(b.id)||0)-(Number(a.id)||0));saveDB(merged);document.getElementById("dataMsg").textContent=`Backup importado: ${added} nuevos, ${updated} actualizados. Total en historial: ${merged.length}.`;document.getElementById("importFile").value="";show("history");renderHistory()}catch{document.getElementById("dataMsg").textContent="Archivo no válido.";document.getElementById("importFile").value=""}};rd.readAsText(f)}
+function clearAll(){if(confirm("¿Borrar todo el historial de este iPhone?")){localStorage.removeItem("valuePickDB");renderHistory();document.getElementById("dataMsg").textContent="Historial borrado."}}
+document.getElementById("form").addEventListener("input",()=>{document.getElementById("result").innerHTML="";queueDraftSave()});
+document.getElementById("form").addEventListener("change",()=>{document.getElementById("result").innerHTML="";queueDraftSave()});
+window.addEventListener("beforeunload",saveDraftNow);
+setTimeout(()=>{if(hasDraft())restoreDraft();else saveDraftNow()},250);
+if("serviceWorker"in navigator&&location.protocol!=="file:")navigator.serviceWorker.register("sw.js?ver=1.5.8").catch(()=>{});
+</script>
+
+<div id="vp-test-tools" style="margin:12px 0;padding:12px;border:1px dashed #94a3b8;border-radius:12px;background:#fff">
+  <div style="font-weight:700;margin-bottom:8px">🧪 Herramientas de prueba</div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <button type="button" id="vp-load-test" style="padding:10px 14px;border:0;border-radius:10px;background:#334155;color:white;font-weight:700">Cargar prueba completa</button>
+    <button type="button" id="vp-clear-test" style="padding:10px 14px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;color:#000;font-weight:700">Limpiar formulario</button>
+  </div>
+  <div id="vp-test-status" style="font-size:12px;color:#64748b;margin-top:7px"></div>
+</div>
+<script>
+(function(){
+  const test = {
+    meta: {
+      date:"2026-08-15", league:"Liga de Prueba", season:"2026/27",
+      home:"Atlético Aurora", away:"Deportivo Central", leagueAvg:"1.35",
+      note:"PRUEBA V1.5.3 — DATOS COMPLETAMENTE FICTICIOS. No utilizar para apuestas."
+    },
+    home: {
+      gf:["48","15","8"], ga:["36","9","5"], xg:["51.20","16.40","8.70"], xga:["38.50","10.20","5.80"],
+      shots:["420","138","72"], sot:["148","49","27"], sa:["330","102","51"],
+      sota:["108","32","16"], bc:["82","27","15"], bca:["61","18","9"], rest:["7","6","7"]
+    },
+    away: {
+      gf:["39","12","7"], ga:["43","14","8"], xg:["43.80","13.10","7.20"], xga:["45.60","15.30","8.40"],
+      shots:["365","121","63"], sot:["126","41","21"], sa:["395","133","69"],
+      sota:["137","45","24"], bc:["67","22","12"], bca:["78","28","15"], rest:["6","5","6"]
+    },
+    absences: {
+      home:[
+        {name:"Carlos Vega",status:"confirmed",att:"80",def:"20"},
+        {name:"Miguel Torres",status:"doubt",att:"60",def:"40"}
+      ],
+      away:[
+        {name:"Andrés Ruiz",status:"confirmed",att:"50",def:"70"},
+        {name:"Daniel Mora",status:"doubt",att:"40",def:"80"}
+      ]
+    },
+    odds:{
+      home:"2.20", draw:"3.20", away:"3.40",
+      over15:"1.30", under15:"3.40", over25:"1.85", under25:"1.90",
+      over35:"3.10", under35:"1.35", bttsYes:"1.80", bttsNo:"1.95",
+      homeDnb:"1.65", awayDnb:"2.10", home05:"1.25", home15:"2.05",
+      away05:"1.35", away15:"2.70", home05plus:"1.35", away05plus:"1.65"
+    }
+  };
+
+  function setValue(el,val){
+    if(!el) return false;
+    el.value=val;
+    el.dispatchEvent(new Event("input",{bubbles:true}));
+    el.dispatchEvent(new Event("change",{bubbles:true}));
+    return true;
+  }
+
+  function setTeam(side,data){
+    for(const p of [["season",0],["last10",1],["last5",2]]){
+      const period=p[0], idx=p[1];
+      for(const key of ["gf","ga","xg","xga","shots","sot","sa","sota","bc","bca","rest"]){
+        const el=document.querySelector(`[data-team="${side}"][data-period="${period}"][data-key="${key}"]`);
+        if(el) setValue(el,data[key][idx]);
+      }
+    }
+  }
+
+  function fillAbsences(side, rows){
+    const tbody=document.querySelector(`#${side}Abs tbody`);
+    if(!tbody) return;
+    tbody.innerHTML="";
+    addAbsence(side);
+    addAbsence(side);
+    const trs=[...tbody.querySelectorAll("tr")].slice(0,2);
+    rows.forEach((r,i)=>{
+      const tr=trs[i];
+      if(!tr) return;
+      setValue(tr.querySelector(".abs-name"),r.name);
+      setValue(tr.querySelector(".abs-status"),r.status);
+      setValue(tr.querySelector(".abs-att"),r.att);
+      setValue(tr.querySelector(".abs-def"),r.def);
+    });
+    updateAbsSummary(side);
+  }
+
+  function fillOdds(){
+    Object.entries(test.odds).forEach(([key,val])=>{
+      const el=document.querySelector(`[data-odd="${key}"]`);
+      if(el) setValue(el,val);
+    });
+  }
+
+  function loadTest(){
+    setValue(document.getElementById("date"),test.meta.date);
+    setValue(document.getElementById("league"),test.meta.league);
+    setValue(document.getElementById("season"),test.meta.season);
+    setValue(document.getElementById("leagueAvg"),test.meta.leagueAvg);
+    setValue(document.getElementById("home"),test.meta.home);
+    setValue(document.getElementById("away"),test.meta.away);
+    setValue(document.getElementById("notes"),test.meta.note);
+
+    setTeam("home",test.home);
+    setTeam("away",test.away);
+    fillAbsences("home",test.absences.home);
+    fillAbsences("away",test.absences.away);
+    fillOdds();
+
+    const status=document.getElementById("vp-test-status");
+    if(status) status.textContent="✅ Prueba completa cargada correctamente. Revisa visualmente y pulsa Analizar y guardar.";
+  }
+
+  function clearForm(){
+    const fields=[...document.querySelectorAll("input,select,textarea")];
+    fields.forEach(el=>{
+      if(el.type==="button" || el.type==="submit" || el.type==="file") return;
+      if(el.tagName==="SELECT") el.selectedIndex=0;
+      else el.value="";
+      el.dispatchEvent(new Event("input",{bubbles:true}));
+      el.dispatchEvent(new Event("change",{bubbles:true}));
+    });
+    // Rebuild the normal default absence rows.
+    if(typeof renderAbsenceCards==="function") renderAbsenceCards();
+    const status=document.getElementById("vp-test-status");
+    if(status) status.textContent="Formulario en blanco.";
+  }
+
+  const load=document.getElementById("vp-load-test");
+  const clear=document.getElementById("vp-clear-test");
+  if(load) load.addEventListener("click",loadTest);
+  if(clear) clear.addEventListener("click",clearForm);
+})();
+</script>
+
+</body>
+</html>
