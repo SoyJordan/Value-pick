@@ -1,9 +1,0 @@
-{
-  "name": "SoyJordan Picks V1.6",
-  "short_name": "SoyJordan Picks",
-  "start_url": "./",
-  "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#000000",
-  "description": "Sistema manual de análisis deportivo V1.6: Últimos 10/5, condición local-visitante, Poisson, EV, robustez y hándicap asiático ±1."
-}
