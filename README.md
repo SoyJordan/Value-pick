@@ -1,0 +1,16 @@
+# SoyJordan Picks V1.6.2
+
+Actualización visual y operativa sobre V1.6.1. El motor matemático V1.6 se mantiene sin cambios.
+
+## Cambios V1.6.2
+- Botón para descargar una captura PNG limpia del resultado.
+- Historial rediseñado con tarjetas acordes a la interfaz.
+- Selector visual de picks para registrar apuestas reales.
+- Confirmación de apuesta que bloquea el análisis prepartido.
+- Estado PENDIENTE / GANADA / PERDIDA / PUSH conservado en apuestas.
+- Bank compacto y sticky con Bank, P/L y Disponible.
+- Logo único SoyJordan Picks e iconos PWA.
+- Backup actualizado a V1.6.2 y compatibilidad con datos V1.6.1.
+
+## Instalación en GitHub Pages
+Sube todos los archivos de esta carpeta al mismo nivel del repositorio: `index.html`, `manifest.json`, `sw.js`, `logo.svg`, `icon-192.png` e `icon-512.png`.
