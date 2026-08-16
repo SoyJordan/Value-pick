@@ -1,0 +1,1363 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<link rel="manifest" href="manifest.json">
+<title>SoyJordan Picks V1.6.2.1</title>
+<style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",Arial,sans-serif;color:#000;background:#000000}
+*{box-sizing:border-box}body{margin:0;padding-bottom:40px;background:#000;color:#fff}.app{max-width:900px;margin:auto;padding:14px}
+header{padding:10px 2px 8px}h1{margin:0;font-size:30px;color:#fff}h2{font-size:19px;margin:0 0 12px;color:#000}h3{font-size:16px;color:#000}
+.card{background:#fff;color:#000;border-radius:18px;padding:15px;margin:11px 0;box-shadow:0 2px 12px #00000055}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.full{grid-column:1/-1}label{font-size:12px;font-weight:700;display:block;min-width:0;color:#000}
+input,select,textarea{display:block;width:100%;max-width:100%;min-width:0;margin-top:5px;padding:11px;border:1px solid #000;border-radius:10px;font-size:16px;background:#000;color:#fff;color-scheme:dark}
+input[type=date]{width:100%;max-width:100%;min-width:0;display:block;height:44px;box-sizing:border-box;appearance:none;-webkit-appearance:none;overflow:hidden;text-overflow:clip;padding:11px 10px}input[type=date]::-webkit-date-and-time-value{text-align:left}input[type=date]::-webkit-calendar-picker-indicator{margin-left:auto}
+textarea{min-height:70px}button{border:0;border-radius:11px;padding:12px 15px;font-weight:800;font-size:15px;background:#000;color:#fff}button.secondary{background:#fff;color:#000;border:1px solid #000}.dangerBtn{background:#000;color:#fff;padding:8px 10px;font-size:13px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}.nav{display:flex;gap:7px;margin:9px 0}.nav button{flex:1}
+table{width:100%;border-collapse:collapse;font-size:12px;color:#000}td,th{padding:7px 4px;border-bottom:1px solid #0003;text-align:left;vertical-align:middle}
+.good{background:#166534}.watch{background:#854d0e}.bad{background:#991b1b}.metric{display:inline-block;background:#000;border-radius:10px;padding:7px;margin:4px 4px 0 0;font-size:12px;color:#fff}
+.muted{color:#000;opacity:.72}.small{font-size:12px}.hidden{display:none}.pill{display:inline-block;padding:5px 8px;border-radius:999px;background:#000;font-size:11px;color:#fff}
+.abs-grid,.result-grid{overflow-x:auto}.abs-grid table{min-width:720px}.result-grid table{min-width:760px}.note{background:#f2f2f2;border-left:4px solid #000;padding:9px;border-radius:8px;font-size:12px;color:#000}
+.summary{display:grid;grid-template-columns:1fr 1fr;gap:8px}.summary .box{background:#f2f2f2;border:1px solid #000;border-radius:12px;padding:10px;color:#000}.diag{background:#f2f2f2;border:1px solid #000;border-radius:12px;padding:10px;margin-top:10px;color:#000}.diag table{font-size:12px}
+.history-row{cursor:pointer}.history-row:active{background:#eee}.detail-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}.detail-section{margin-top:12px}.detail-section h3{margin:0 0 8px}header .muted{color:#fff;opacity:.75}.draft-badge{display:inline-block;margin-top:6px;padding:5px 8px;border-radius:999px;background:#fff;color:#000;border:1px solid #fff;font-size:11px;font-weight:700}
+@media(max-width:560px){.grid{grid-template-columns:1fr}.grid label input[type=date]{width:100%;max-width:100%;height:44px}.full{grid-column:auto}.summary{grid-template-columns:1fr}.app{padding:12px}.card{padding:13px}input,select,textarea{font-size:16px}}
+
+.bank-panel{position:sticky;top:0;z-index:50;background:#fff;color:#000;border:2px solid #000;border-radius:16px;padding:10px 12px;margin:8px 0 12px;box-shadow:0 3px 14px #0008}
+.bank-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.bank-cell{background:#000;color:#fff;border-radius:10px;padding:8px;min-width:0}
+.bank-cell .k{font-size:10px;opacity:.75;text-transform:uppercase;letter-spacing:.04em}
+.bank-cell .v{font-size:17px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bank-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.bank-actions button{padding:8px 10px;font-size:12px}
+.bet-card,.combo-card{border:1px solid #000;border-radius:12px;padding:10px;margin:8px 0;background:#f7f7f7;color:#000}
+.bet-status{font-weight:800}
+.status-win{color:#166534}.status-loss{color:#991b1b}.status-push{color:#854d0e}.status-pending{color:#444}
+.compact-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.combo-leg{display:flex;justify-content:space-between;gap:8px;align-items:center;border-bottom:1px solid #0002;padding:6px 0}
+.money-positive{color:#166534;font-weight:800}.money-negative{color:#991b1b;font-weight:800}
+@media(max-width:560px){.bank-grid{grid-template-columns:1fr 1fr}.compact-grid{grid-template-columns:1fr}}
+
+
+/* V1.6.2.1 · UI */
+.brand-header{display:flex;align-items:center;gap:12px;padding:5px 2px 7px}.brand-logo{width:210px;max-width:58vw;height:auto;display:block}.brand-copy{margin-left:auto;text-align:right}.brand-header .muted{font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+.bank-compact{padding:7px 9px;border-radius:14px;margin:6px 0 10px;position:sticky;top:4px}.bank-strip{display:grid;grid-template-columns:minmax(130px,1.6fr) 1fr 1fr auto;gap:6px;align-items:center}.bank-primary,.bank-mini-stat{background:#000;color:#fff;border-radius:9px;padding:6px 8px;min-width:0}.bank-primary{display:flex;align-items:center;gap:7px}.bank-icon{font-size:19px}.bank-primary small,.bank-mini-stat small{display:block;font-size:9px;opacity:.65;letter-spacing:.08em}.bank-primary b,.bank-mini-stat b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bank-mini-actions{display:flex;gap:4px}.bank-mini-actions button{padding:7px 9px;font-size:13px}.bank-meta{display:flex;gap:12px;flex-wrap:wrap;font-size:9px;margin-top:4px;padding:0 3px;opacity:.74}.bank-meta #bankPnlText{display:none}
+.result-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}.result-head h2{margin:0}.download-result-btn{padding:9px 11px;font-size:12px}.locked-badge{display:inline-block;margin-top:6px;background:#111;color:#fff;padding:5px 8px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:.04em}
+.history-cards{display:grid;gap:9px}.history-card{border:1px solid #000;border-radius:14px;padding:11px;background:#f7f7f7}.history-card-top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}.history-match{font-size:15px;font-weight:900}.history-date{font-size:10px;opacity:.65}.history-pick{margin-top:8px;background:#000;color:#fff;border-radius:10px;padding:8px;display:grid;grid-template-columns:1fr auto;gap:6px}.history-pick small{opacity:.7}.history-card-actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}.history-card-actions button{padding:8px 10px;font-size:12px}.status-chip{font-size:10px;font-weight:900;border-radius:999px;padding:4px 7px;background:#ddd;color:#111}.status-chip.pending{background:#facc15}.status-chip.locked{background:#111;color:#fff}
+.modal{position:fixed;inset:0;z-index:200;display:flex;align-items:flex-end;justify-content:center}.modal.hidden{display:none}.modal-backdrop{position:absolute;inset:0;background:#000b}.modal-sheet{position:relative;width:min(760px,100%);max-height:88vh;overflow:auto;background:#fff;color:#000;border-radius:22px 22px 0 0;padding:16px;box-shadow:0 -10px 40px #0008}.modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;position:sticky;top:-16px;background:#fff;padding:16px 0 8px;z-index:2}.modal-head h2{margin:2px 0 0}.eyebrow{font-size:10px;font-weight:900;letter-spacing:.12em;opacity:.55}.icon-btn{padding:8px 10px}.pick-grid{display:grid;gap:7px}.pick-option{border:2px solid #ddd;border-radius:12px;padding:10px;cursor:pointer;background:#fafafa}.pick-option.selected{border-color:#000;box-shadow:0 0 0 2px #0001}.pick-option.good{background:#ecfdf5;color:#052e16;border-color:#16a34a}.pick-option.watch{background:#fffbeb;color:#451a03;border-color:#d97706}.pick-option.bad{background:#fff;color:#111;border-color:#ddd;opacity:.72}.pick-option-row{display:grid;grid-template-columns:1fr repeat(4,auto);gap:8px;align-items:center}.pick-option .pick-name{font-weight:900}.pick-option .mini{font-size:10px;opacity:.7}.pick-option .dec{font-size:10px;font-weight:900;border-radius:999px;padding:4px 6px;background:#000;color:#fff}.bet-form-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.lock-note{margin:10px 0;background:#f2f2f2;border-left:4px solid #000;padding:9px;border-radius:8px;font-size:11px}.confirm-bet-btn{width:100%;background:#b91c1c;color:#fff}.capture-shell{background:#fff;color:#000;padding:18px;width:860px;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",Arial,sans-serif}.capture-brand{display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #000;padding-bottom:10px;margin-bottom:12px}.capture-brand img{width:190px}.capture-footer{margin-top:12px;font-size:10px;opacity:.65;text-align:center}
+@media(max-width:560px){.brand-logo{width:175px}.brand-copy{display:none}.bank-strip{grid-template-columns:1.4fr .9fr .9fr auto}.bank-primary b,.bank-mini-stat b{font-size:12px}.bank-meta{gap:8px}.result-head{align-items:flex-start}.download-result-btn{max-width:145px}.bet-form-grid{grid-template-columns:1fr}.pick-option-row{grid-template-columns:1fr auto}.pick-option-row .pick-metric{display:none}.modal-sheet{padding:13px}.history-card-actions button{flex:1}.nav{overflow-x:auto}.nav button{min-width:max-content}}
+
+
+.audit-card{border:1px solid #111;border-radius:14px;padding:12px;background:#fff;margin-top:12px}
+.audit-score{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;padding:12px;border-radius:12px;background:#111;color:#fff}
+.audit-team{font-weight:900;font-size:14px}.audit-team:last-child{text-align:right}.audit-score-main{font-size:28px;font-weight:900;white-space:nowrap}
+.audit-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:9px}
+.audit-stat{background:#f3f3f3;border-radius:10px;padding:9px}.audit-stat small{display:block;opacity:.65;margin-bottom:3px}.audit-stat b{font-size:14px}
+.audit-outcome{display:inline-block;border-radius:999px;padding:5px 8px;font-size:10px;font-weight:900}
+.audit-win{background:#166534;color:#fff}.audit-loss{background:#b42323;color:#fff}.audit-push{background:#666;color:#fff}.audit-pending{background:#facc15;color:#111}
+.audit-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.audit-actions button{flex:1;min-width:130px}
+@media(max-width:560px){.audit-grid{grid-template-columns:1fr}.audit-score{grid-template-columns:1fr auto 1fr}.audit-score-main{font-size:24px}}
+
+</style>
+</head>
+<body>
+<main class="app">
+<header class="brand-header">
+  <img src="logo.svg" class="brand-logo" alt="SoyJordan Picks">
+  <div class="brand-copy"><div class="muted">V1.6.2.1 · análisis · estrategia · value</div></div>
+</header>
+
+<div id="bankPanel" class="bank-panel bank-compact">
+  <div class="bank-strip">
+    <div class="bank-primary"><span class="bank-icon">💰</span><span><small>BANK</small><b id="bankCurrentDisplay">$0</b></span></div>
+    <div class="bank-mini-stat"><small>P/L</small><b id="bankPnlCompact">$0</b></div>
+    <div class="bank-mini-stat"><small>DISP.</small><b id="bankAvailableDisplay">$0</b></div>
+    <div class="bank-mini-actions">
+      <button type="button" title="Editar bank inicial" onclick="setInitialBank()">✏️</button>
+      <button type="button" class="secondary" title="Ingreso / retiro" onclick="adjustBank()">±</button>
+    </div>
+  </div>
+  <div class="bank-meta"><span>Inicial <b id="bankInitialDisplay">$0</b></span><span>En juego <b id="bankPendingDisplay">$0</b></span><span id="bankPnlText"></span></div>
+</div>
+
+<div class="nav">
+<button onclick="show('analysis')">Nuevo análisis</button>
+<button class="secondary" onclick="show('history')">Historial</button>
+<button class="secondary" onclick="show('combos')">Combinadas</button>
+<button class="secondary" onclick="show('backup')">Datos</button>
+</div>
+
+<section id="analysis">
+<div id="draftStatus" class="draft-badge">💾 Borrador automático activo</div>
+<form id="form">
+<div class="card">
+<h2>Partido</h2>
+<div class="grid">
+<label>Fecha<input id="date" type="date" required></label>
+<label>Liga<input id="league" required></label>
+<label>Temporada<input id="season" value="2026/27"></label>
+<label>Promedio goles liga por equipo/partido<input id="leagueAvg" type="number" step=".01" value="1.35"></label>
+<label class="full">Fuente de datos<input id="dataSource" placeholder="Ej.: FotMob / Opta"></label>
+<label>Local<input id="home" required></label>
+<label>Visitante<input id="away" required></label>
+<label class="full">Notas<textarea id="notes" placeholder="Contexto objetivo, fuentes, etc."></textarea></label>
+</div>
+<div class="note" style="margin-top:10px">
+<b>V1.6:</b> usa <b>Últimos 10 (50%) + Últimos 5 (30%) + Últimos 5 en condición (20%)</b>.
+Los datos de GF, GA, xG, xGA, tiros y ocasiones se introducen como <b>totales acumulados</b>.
+La app los convierte a promedio por partido. Un campo vacío se ignora y su peso se redistribuye; no se interpreta como cero.
+</div>
+</div>
+
+<div id="teamCards"></div>
+
+<div class="card">
+<h2>🩹 Ausencias con impacto</h2>
+<div class="note">
+La escala 0–100 mide la importancia relativa del jugador, no el porcentaje de goles que desaparece. Una baja confirmada pesa 100%; una duda pesa 50%. En V1.5 el impacto máximo sobre λ ofensivo/defensivo está limitado para evitar que una sola ausencia destruya el modelo.
+</div>
+<div id="absenceCards"></div>
+</div>
+
+<div class="card">
+<h2>💰 Cuotas</h2>
+<p class="small muted">Introduce solo las cuotas disponibles. El modelo compara probabilidad propia contra la cuota indicada.</p>
+<div id="odds"></div>
+</div>
+
+<button type="submit" style="width:100%">ANALIZAR Y GUARDAR</button><button type="button" class="secondary" style="width:100%;margin-top:8px" onclick="clearCurrentForm()">🧹 Limpiar datos</button>
+</form>
+<div id="result"></div>
+</section>
+
+<section id="history" class="hidden">
+<div id="historyList" class="card"><h2>📚 Historial</h2><div id="stats"></div><p class="small muted">Toca un partido para ver todos los datos guardados y el resultado completo.</p><div id="historyTable"></div></div>
+<div id="historyDetail" class="hidden"></div>
+</section>
+
+
+<section id="combos" class="hidden">
+  <div class="card">
+    <h2>🔗 Crear combinada</h2>
+    <p class="small muted">Agrega picks ya analizados. La cuota combinada se calcula automáticamente.</p>
+    <div class="compact-grid">
+      <label>Partido<select id="comboAnalysisSelect" onchange="refreshComboPickOptions()"></select></label>
+      <label>Pick<select id="comboPickSelect"></select></label>
+    </div>
+    <div class="actions" style="margin-top:8px">
+      <button type="button" onclick="addComboLeg()">+ Agregar selección</button>
+      <button type="button" class="secondary" onclick="clearComboBuilder()">Limpiar combinada</button>
+    </div>
+    <div id="comboBuilderLegs" style="margin-top:10px"></div>
+    <div class="summary" style="margin-top:10px">
+      <div class="box">Cuota combinada<br><b id="comboCombinedOdds">1.00</b></div>
+      <div class="box">Retorno potencial<br><b id="comboPotentialReturn">$0</b></div>
+    </div>
+    <div class="compact-grid" style="margin-top:8px">
+      <label>Nombre de la combinada<input id="comboName" placeholder="Ej.: MLS noche"></label>
+      <label>Monto apostado<input id="comboStake" type="number" min="0" step="1000" placeholder="Ej.: 50000" oninput="renderComboBuilder()"></label>
+    </div>
+    <button type="button" style="width:100%;margin-top:10px" onclick="saveCombo()">GUARDAR COMBINADA</button>
+  </div>
+
+  <div class="card">
+    <h2>📚 Combinadas guardadas</h2>
+    <div id="comboStats"></div>
+    <div id="comboList"></div>
+  </div>
+</section>
+
+<section id="backup" class="hidden">
+<div class="card">
+<h2>💾 Datos</h2>
+<p>El backup V1.6.2.1 incluye análisis, apuestas individuales, combinadas, bank inicial y ajustes manuales.</p>
+<div class="actions">
+<button onclick="exportData()">Exportar backup</button>
+<label style="display:inline-block">
+<input id="importFile" type="file" accept=".json" onchange="importData(event)" style="display:none">
+<button type="button" class="secondary" onclick="document.getElementById('importFile').click()">Importar backup</button>
+</label>
+<button class="secondary" onclick="clearAll()">Borrar datos</button>
+</div>
+<p id="dataMsg" class="small"></p>
+</div>
+</section>
+
+<div id="betModal" class="modal hidden" role="dialog" aria-modal="true">
+  <div class="modal-backdrop" onclick="closeBetModal()"></div>
+  <div class="modal-sheet">
+    <div class="modal-head"><div><div class="eyebrow">CONFIRMAR APUESTA</div><h2 id="betModalTitle">Seleccionar pick</h2></div><button type="button" class="icon-btn secondary" onclick="closeBetModal()">✕</button></div>
+    <div id="betPickGrid" class="pick-grid"></div>
+    <div class="bet-form-grid">
+      <label>Monto apostado<input id="betStakeInput" type="number" min="1" step="1000" value="50000"></label>
+      <label>Cuota tomada<input id="betOddsInput" type="number" min="1.01" step=".01"></label>
+      <label>Valor de 1 unidad<input id="betUnitInput" type="number" min="0" step="1000" value="0"></label>
+    </div>
+    <div class="lock-note">🔒 Al confirmar, el análisis prepartido queda bloqueado como evidencia de la prueba.</div>
+    <button type="button" class="confirm-bet-btn" onclick="confirmBetFromModal()">🔒 CONFIRMAR APUESTA</button>
+  </div>
+</div>
+</main>
+
+<script>
+const periods=[["last10","Últimos 10",10,.50],["last5","Últimos 5",5,.30],["condition5","Últimos 5 condición",5,.20]];
+const metrics=[
+["gf","GF"],["ga","GA"],["xg","xG"],["xga","xGA"],
+["shots","Tiros"],["sot","Tiros al arco"],["sa","Tiros recibidos"],
+["sota","Tiros al arco recibidos"],["bc","Ocasiones claras"],["bca","Ocasiones concedidas"]
+];
+const markets=[
+["1X2","home","Local"],["1X2","draw","Empate"],["1X2","away","Visitante"],
+["TOTAL","over15","Over 1.5"],["TOTAL","under15","Under 1.5"],
+["TOTAL","over25","Over 2.5"],["TOTAL","under25","Under 2.5"],
+["TOTAL","over35","Over 3.5"],["TOTAL","under35","Under 3.5"],
+["BTTS","bttsYes","BTTS Sí"],["BTTS","bttsNo","BTTS No"],
+["DNB","homeDnb","Local DNB"],["DNB","awayDnb","Visitante DNB"],
+["TEAM","home05","Local Over 0.5"],["TEAM","home15","Local Over 1.5"],
+["TEAM","away05","Visitante Over 0.5"],["TEAM","away15","Visitante Over 1.5"]
+];
+
+function build(){
+let tc=document.getElementById("teamCards"); tc.innerHTML="";
+for(const [side,title] of [["home","🏠 Local"],["away","✈️ Visitante"]]){
+const conditionLabel=side==="home"?"Últimos 5 en casa":"Últimos 5 fuera";
+let h=`<div class="card"><h2>${title}</h2><table><tr><th>Métrica</th><th>Últimos 10<br><span class="muted">50% · n=10</span></th><th>Últimos 5<br><span class="muted">30% · n=5</span></th><th>${conditionLabel}<br><span class="muted">20% · n=5</span></th></tr>`;
+for(const [k,l] of metrics){
+h+=`<tr><td>${l}</td>${periods.map(p=>`<td><input data-team="${side}" data-period="${p[0]}" data-key="${k}" type="number" step=".01"></td>`).join("")}</tr>`;
+}
+h+=`</table>
+<div class="grid" style="margin-top:10px">
+<label>Días de descanso<input data-team="${side}" data-key="restCurrent" type="number" min="0" step="1" placeholder="Ej.: 7"></label>
+</div>
+<p class="small muted">Totales acumulados en cada ventana. Para descanso usa solo los días desde el último partido.</p></div>`;
+tc.innerHTML+=h;
+}
+document.getElementById("odds").innerHTML=`
+${markets.map(x=>`<div class="grid" style="margin:6px 0"><label class="full">${x[0]} · ${x[2]}<input data-odd="${x[1]}" type="number" min="1.01" step=".01" placeholder="Cuota"></label></div>`).join("")}
+<div class="card" style="box-shadow:none;background:#f2f2f2">
+<h3 style="margin:0 0 8px">Hándicap asiático ±1</h3>
+<div class="grid">
+<label>Línea Local
+<select id="homeAhLine">
+<option value="1">Local +1 / Visitante -1</option>
+<option value="-1">Local -1 / Visitante +1</option>
+</select>
+</label>
+<label>Cuota Local<input id="homeAhOdds" type="number" min="1.01" step=".01" placeholder="Cuota"></label>
+<label>Línea Visitante<input id="awayAhLineDisplay" value="Visitante -1" readonly></label>
+<label>Cuota Visitante<input id="awayAhOdds" type="number" min="1.01" step=".01" placeholder="Cuota"></label>
+</div>
+<p class="small muted">La línea contraria se actualiza automáticamente. Con ±1 existe PUSH/reembolso si el margen final coincide exactamente con la línea.</p>
+</div>`;
+document.getElementById("homeAhLine").addEventListener("change",syncAhLine);
+syncAhLine();
+renderAbsenceCards();
+}
+function syncAhLine(){
+ const h=+(document.getElementById("homeAhLine")?.value||1);
+ const a=-h;
+ const el=document.getElementById("awayAhLineDisplay");
+ if(el)el.value=`Visitante ${a>0?"+":""}${a}`;
+}
+build();
+document.getElementById("date").value=new Date().toISOString().slice(0,10);
+
+function renderAbsenceCards(){
+const wrap=document.getElementById("absenceCards"); wrap.innerHTML="";
+for(const [side,title] of [["home","🏠 Local"],["away","✈️ Visitante"]]){
+const id=side+"Abs";
+wrap.innerHTML+=`
+<div class="card" style="box-shadow:none;background:#fff">
+<h3 style="margin:0 0 8px">${title}</h3>
+<div class="abs-grid"><table id="${id}">
+<thead><tr><th>Jugador</th><th>Estado</th><th>Imp. ataque 0–100</th><th>Imp. defensa 0–100</th><th>Impacto ataque</th><th>Impacto defensa</th><th></th></tr></thead>
+<tbody></tbody></table></div>
+<div class="actions" style="margin-top:8px"><button type="button" onclick="addAbsence('${side}')">+ Añadir jugador</button></div>
+<div id="${side}AbsSummary" class="small muted" style="margin-top:7px"></div>
+</div>`;
+addAbsence(side);
+}
+}
+function addAbsence(side){
+const tbody=document.querySelector(`#${side}Abs tbody`),tr=document.createElement("tr");
+tr.innerHTML=`<td><input class="abs-name" placeholder="Nombre"></td>
+<td><select class="abs-status"><option value="confirmed">Baja confirmada</option><option value="doubt">Duda</option><option value="available">Disponible</option></select></td>
+<td><input class="abs-att" type="number" min="0" max="100" step="1" value="0"></td>
+<td><input class="abs-def" type="number" min="0" max="100" step="1" value="0"></td>
+<td class="abs-att-impact">0</td><td class="abs-def-impact">0</td>
+<td><button type="button" class="dangerBtn" onclick="this.closest('tr').remove();updateAbsSummary('${side}')">×</button></td>`;
+tbody.appendChild(tr);tr.querySelectorAll("input,select").forEach(el=>el.addEventListener("input",()=>updateAbsSummary(side)));updateAbsSummary(side);
+}
+function statusMultiplier(status){return status==="confirmed"?1:status==="doubt"?.5:0}
+function getAbsences(side){
+return [...document.querySelectorAll(`#${side}Abs tbody tr`)].map(tr=>{
+const status=tr.querySelector(".abs-status").value,m=statusMultiplier(status);
+const att=Math.max(0,Math.min(100,+tr.querySelector(".abs-att").value||0))*m;
+const def=Math.max(0,Math.min(100,+tr.querySelector(".abs-def").value||0))*m;
+tr.querySelector(".abs-att-impact").textContent=att.toFixed(0);tr.querySelector(".abs-def-impact").textContent=def.toFixed(0);
+return {name:tr.querySelector(".abs-name").value,status,att,def};
+});
+}
+function cappedImpact(arr,key){return Math.min(100,arr.reduce((s,x)=>s+x[key],0))}
+function updateAbsSummary(side){
+const arr=getAbsences(side),att=cappedImpact(arr,"att"),def=cappedImpact(arr,"def");
+document.getElementById(side+"AbsSummary").innerHTML=`Impacto ofensivo: <b>${att.toFixed(0)}/100</b> · Impacto defensivo: <b>${def.toFixed(0)}/100</b>`;
+}
+function getTeam(side){
+let d={}; for(const p of periods){d[p[0]]={};for(const [k] of metrics){
+let el=document.querySelector(`[data-team="${side}"][data-period="${p[0]}"][data-key="${k}"]`);
+d[p[0]][k]=el&&el.value!==""?+el.value:null;
+}}
+const restEl=document.querySelector(`[data-team="${side}"][data-key="restCurrent"]`);
+d.restCurrent=restEl&&restEl.value!==""?+restEl.value:null;
+return d;
+}
+function perMatch(d,period,k){
+const v=d?.[period]?.[k]; if(v==null)return null;
+const n=periods.find(x=>x[0]===period)?.[2]||1;
+return v/n;
+}
+function weightedPerMatch(d,k){
+let arr=periods.map(p=>({period:p[0],n:p[2],w:p[3],v:d?.[p[0]]?.[k]})).filter(x=>x.v!=null);
+if(!arr.length)return null;
+const ws=arr.reduce((s,x)=>s+x.w,0);
+return arr.reduce((s,x)=>s+(x.w/ws)*(x.v/x.n),0);
+}
+function currentRest(d){return d?.restCurrent==null?7:d.restCurrent}
+function shrink(raw,alpha=.65){return 1+alpha*(raw-1)}
+function clamp(x,a,b){return Math.max(a,Math.min(b,x))}
+function expGoals(h,a,avg,absH,absA){
+const hXG=weightedPerMatch(h,"xg"),hGF=weightedPerMatch(h,"gf"),hXGA=weightedPerMatch(h,"xga"),hGA=weightedPerMatch(h,"ga");
+const aXG=weightedPerMatch(a,"xg"),aGF=weightedPerMatch(a,"gf"),aXGA=weightedPerMatch(a,"xga"),aGA=weightedPerMatch(a,"ga");
+function attack(xg,gf){let vals=[xg,gf].filter(v=>v!=null);if(!vals.length)return {raw:1,shrunk:1,source:"default"};let raw=vals.length===2?.7*(vals[0]/avg)+.3*(vals[1]/avg):vals[0]/avg;return {raw,shrunk:shrink(raw),source:vals.length===2?"70% xG / 30% GF":"available metric"}}
+function defense(xga,ga){let vals=[xga,ga].filter(v=>v!=null);if(!vals.length)return {raw:1,shrunk:1,source:"default"};let raw=vals.length===2?.7*(vals[0]/avg)+.3*(vals[1]/avg):vals[0]/avg;return {raw,shrunk:shrink(raw),source:vals.length===2?"70% xGA / 30% GA":"available metric"}}
+const Hatt=attack(hXG,hGF),Aatt=attack(aXG,aGF),Hdef=defense(hXGA,hGA),Adef=defense(aXGA,aGA);
+const restH=currentRest(h),restA=currentRest(a);
+const homeVenue=1.08,awayVenue=.96;
+const restHF=1+clamp(restH-7,-3,3)*.01,restAF=1+clamp(restA-7,-3,3)*.01;
+const absenceHAtt=1-.10*(absH.att/100),absenceAAtt=1-.10*(absA.att/100);
+const absenceHDef=1+.10*(absH.def/100),absenceADef=1+.10*(absA.def/100);
+const baseH=avg*Hatt.shrunk*Adef.shrunk*homeVenue;
+const baseA=avg*Aatt.shrunk*Hdef.shrunk*awayVenue;
+const finalH=clamp(baseH*absenceHAtt*absenceADef*restHF,.20,3.50);
+const finalA=clamp(baseA*absenceAAtt*absenceHDef*restAF,.20,3.50);
+return {hl:finalH,al:finalA,diag:{Hatt,Aatt,Hdef,Adef,restH,restA,homeVenue,awayVenue,restHF,restAF,absenceHAtt,absenceAAtt,absenceHDef,absenceADef,baseH,baseA}};
+}
+function pois(k,l){return Math.exp(-l)*Math.pow(l,k)/factorial(k)}
+function factorial(n){let r=1;for(let i=2;i<=n;i++)r*=i;return r}
+function scoreMatrix(hl,al){
+let m=[];for(let h=0;h<=10;h++)for(let a=0;a<=10;a++)m.push([h,a,pois(h,hl)*pois(a,al)]);
+return m;
+}
+function probs(hl,al){
+let m=scoreMatrix(hl,al);
+let p={home:0,draw:0,away:0,bttsYes:0};
+m.forEach(([h,a,v])=>{if(h>a)p.home+=v;else if(h===a)p.draw+=v;else p.away+=v;if(h&&a)p.bttsYes+=v});
+p.bttsNo=1-p.bttsYes;
+for(let [k,t] of [["15",2],["25",3],["35",4]]){p["over"+k]=m.filter(x=>x[0]+x[1]>=t).reduce((s,x)=>s+x[2],0);p["under"+k]=1-p["over"+k]}
+let nd=1-p.draw;p.homeDnb=p.home/nd;p.awayDnb=p.away/nd;
+p.home05=1-pois(0,hl);p.home15=1-(pois(0,hl)+pois(1,hl));
+p.away05=1-pois(0,al);p.away15=1-(pois(0,al)+pois(1,al));
+return p;
+}
+function asianHandicapStats(hl,al,side,line,odds){
+ const m=scoreMatrix(hl,al);
+ let win=0,push=0,loss=0;
+ for(const [h,a,v] of m){
+   const diff=side==="home"?(h-a):(a-h);
+   const adj=diff+line;
+   if(adj>0)win+=v; else if(adj===0)push+=v; else loss+=v;
+ }
+ const fair=win>0?(1-push)/win:999;
+ const impliedWin=(1-push)/odds;
+ const edge=win-impliedWin;
+ const ev=win*odds+push-1;
+ return {win,push,loss,fair,edge,ev};
+}
+function score(p,o,metrics){
+let imp=1/o,ed=p-imp,e=p*o-1;
+let vs=clamp(50+180*e+70*ed,0,100);
+const robustness=metrics.robustness;
+const dataConf=metrics.dataConf;
+const certainty=50+50*Math.abs(2*p-1);
+const edgeStrength=clamp(Math.abs(ed)/.15*100,0,100);
+const conf=clamp(.50*dataConf+.25*robustness+.15*certainty+.10*edgeStrength,25,95);
+let dec=e>=.07&&ed>=.03&&conf>=65&&robustness>=55&&metrics.worstEV>0?"VALUE BET":(e>=.03&&ed>=.02&&conf>=50&&robustness>=40?"WATCH":"NO BET");
+return {p,imp,fair:1/p,ed,e,vs,conf,robustness,worstEV:metrics.worstEV,bestEV:metrics.bestEV,baseEV:e,dec};
+}
+function confidenceScore(h,a,absH,absA){
+let relevant=["gf","ga","xg","xga","shots","sot","sa","sota","bc","bca"],count=0,total=0;
+for(const side of [h,a])for(const p of periods)for(const k of relevant){total++;if(side?.[p[0]]?.[k]!=null)count++}
+const completeness=total?count/total:0;
+const xgRecent=([h,a].filter(t=>t.last10?.xg!=null&&t.last10?.xga!=null&&t.last5?.xg!=null&&t.last5?.xga!=null).length/2);
+const conditionKnown=([h,a].filter(t=>t.condition5?.xg!=null&&t.condition5?.xga!=null).length/2);
+const restKnown=([h,a].filter(t=>t.restCurrent!=null).length/2);
+const sourceKnown=document.getElementById("dataSource")?.value.trim()?1:0;
+const absenceKnown=([absH,absA].filter(x=>x.length>0).length/2);
+function consistency(t){
+ const pairs=[["xg","gf"],["xga","ga"]].map(([x,g])=>{
+   const xv=weightedPerMatch(t,x),gv=weightedPerMatch(t,g);
+   if(xv==null||gv==null||xv<=0)return null;
+   return Math.abs(gv-xv)/xv;
+ }).filter(v=>v!=null);
+ if(!pairs.length)return .5;
+ const avgDiff=pairs.reduce((s,v)=>s+v,0)/pairs.length;
+ return clamp(1-avgDiff,0,1);
+}
+const consistencyAvg=(consistency(h)+consistency(a))/2;
+return clamp(30+30*completeness+10*xgRecent+8*conditionKnown+5*restKnown+4*sourceKnown+3*absenceKnown+10*consistencyAvg,25,95);
+}
+function robustnessFromEVs(evs){
+ const worst=Math.min(...evs),best=Math.max(...evs),range=best-worst;
+ const worstScore=clamp((worst+.05)/.20*100,0,100);
+ const rangeScore=clamp(100-180*range,0,100);
+ const signScore=worst>0?100:(worst>-0.03?50:0);
+ const robustness=clamp(.50*worstScore+.30*rangeScore+.20*signScore,0,100);
+ return {worstEV:worst,bestEV:best,robustness};
+}
+function marketSensitivity(key,odds,hl,al){
+  const factors=[.93,1.07],evs=[];
+  for(const fh of factors) for(const fa of factors){
+    const pp=probs(hl*fh,al*fa)[key];
+    evs.push(pp*odds-1);
+  }
+  return robustnessFromEVs(evs);
+}
+function asianSensitivity(side,line,odds,hl,al){
+ const factors=[.93,1.07],evs=[];
+ for(const fh of factors)for(const fa of factors){
+   evs.push(asianHandicapStats(hl*fh,al*fa,side,line,odds).ev);
+ }
+ return robustnessFromEVs(evs);
+}
+function scoreAsian(stats,odds,metrics,label){
+ const e=stats.ev,ed=stats.edge,robustness=metrics.robustness,dataConf=metrics.dataConf;
+ const vs=clamp(50+180*e+70*ed,0,100);
+ const certainty=50+50*Math.abs(2*stats.win-1);
+ const edgeStrength=clamp(Math.abs(ed)/.15*100,0,100);
+ const conf=clamp(.50*dataConf+.25*robustness+.15*certainty+.10*edgeStrength,25,95);
+ const dec=e>=.07&&ed>=.03&&conf>=65&&robustness>=55&&metrics.worstEV>0?"VALUE BET":(e>=.03&&ed>=.02&&conf>=50&&robustness>=40?"WATCH":"NO BET");
+ return {p:stats.win,push:stats.push,loss:stats.loss,imp:(1-stats.push)/odds,fair:stats.fair,ed,e,vs,conf,robustness,worstEV:metrics.worstEV,bestEV:metrics.bestEV,baseEV:e,dec,market:label,odds,isAsian:true};
+}
+function marketLabel(key){const m=markets.find(x=>x[1]===key);return m?m[2]:key}
+function loadDB(){return JSON.parse(localStorage.getItem("valuePickDB")||"[]")}
+function saveDB(x){localStorage.setItem("valuePickDB",JSON.stringify(x))}
+const DRAFT_KEY="soyJordanDraftV1_6";
+let draftTimer=null;
+let editingRecordId=null;
+function collectFormState(){
+  return {
+    date:document.getElementById("date")?.value||"", league:document.getElementById("league")?.value||"",
+    season:document.getElementById("season")?.value||"", leagueAvg:document.getElementById("leagueAvg")?.value||"",
+    home:document.getElementById("home")?.value||"", away:document.getElementById("away")?.value||"",
+    notes:document.getElementById("notes")?.value||"", dataSource:document.getElementById("dataSource")?.value||"", teams:{home:getTeam("home"),away:getTeam("away")},
+    absences:{home:getAbsences("home"),away:getAbsences("away")},
+    odds:Object.fromEntries([...document.querySelectorAll("[data-odd]")].map(el=>[el.dataset.odd,el.value])), ah:{homeLine:document.getElementById("homeAhLine")?.value||"1",homeOdds:document.getElementById("homeAhOdds")?.value||"",awayOdds:document.getElementById("awayAhOdds")?.value||""}
+  };
+}
+function saveDraftNow(){try{localStorage.setItem(DRAFT_KEY,JSON.stringify(collectFormState()));setDraftStatus("💾 Borrador guardado automáticamente")}catch(e){}}
+function queueDraftSave(){clearTimeout(draftTimer);draftTimer=setTimeout(saveDraftNow,120)}
+function setDraftStatus(text){let el=document.getElementById("draftStatus");if(el)el.textContent=text}
+function hasDraft(){try{const d=JSON.parse(localStorage.getItem(DRAFT_KEY)||"null");return !!d && !!(d.home||d.away||d.league||d.notes||Object.values(d.odds||{}).some(Boolean))}catch(e){return false}}
+function restoreDraft(){
+  try{
+    const d=JSON.parse(localStorage.getItem(DRAFT_KEY)||"null"); if(!d)return;
+    const set=(id,v)=>{const el=document.getElementById(id);if(el&&v!==undefined)el.value=v||""};
+    ["date","league","season","leagueAvg","dataSource","home","away","notes"].forEach(k=>set(k,d[k]));
+    if(d.teams){for(const side of ["home","away"]){for(const p of periods){for(const [k] of metrics){const el=document.querySelector(`[data-team="${side}"][data-period="${p[0]}"][data-key="${k}"]`);if(el&&d.teams[side]?.[p[0]]?.[k]!=null)el.value=d.teams[side][p[0]][k];}}const r=document.querySelector(`[data-team="${side}"][data-key="restCurrent"]`);if(r&&d.teams[side]?.restCurrent!=null)r.value=d.teams[side].restCurrent;}}
+    if(d.absences){for(const side of ["home","away"]){const rows=d.absences[side]||[];const tbody=document.querySelector(`#${side}Abs tbody`);if(tbody){tbody.innerHTML="";if(rows.length){rows.forEach(r=>{addAbsence(side);const tr=tbody.lastElementChild;tr.querySelector(".abs-name").value=r.name||"";tr.querySelector(".abs-status").value=r.status||"confirmed";tr.querySelector(".abs-att").value=r.att||0;tr.querySelector(".abs-def").value=r.def||0;});}else addAbsence(side);updateAbsSummary(side);}}}
+    if(d.odds)Object.entries(d.odds).forEach(([k,v])=>{const el=document.querySelector(`[data-odd="${k}"]`);if(el)el.value=v||""});
+    if(d.ah){if(document.getElementById("homeAhLine"))document.getElementById("homeAhLine").value=d.ah.homeLine||"1";if(document.getElementById("homeAhOdds"))document.getElementById("homeAhOdds").value=d.ah.homeOdds||"";if(document.getElementById("awayAhOdds"))document.getElementById("awayAhOdds").value=d.ah.awayOdds||"";syncAhLine();}
+    setDraftStatus("💾 Borrador recuperado automáticamente");
+  }catch(e){console.warn("No se pudo recuperar borrador",e)}
+}
+function clearDraft(){localStorage.removeItem(DRAFT_KEY);setDraftStatus("Borrador eliminado")}
+function resetFormToBlank(){document.getElementById("form").reset();document.getElementById("date").value=new Date().toISOString().slice(0,10);document.getElementById("leagueAvg").value="1.35";renderAbsenceCards();clearDraft();setDraftStatus("Nuevo análisis listo")}
+
+document.getElementById("form").addEventListener("submit",e=>{
+e.preventDefault();
+const oddsValues=Object.fromEntries([...document.querySelectorAll("[data-odd]")].map(el=>[el.dataset.odd,el.value]));
+const ahHomeOdds=document.getElementById("homeAhOdds")?.value||"",ahAwayOdds=document.getElementById("awayAhOdds")?.value||"";
+if(!Object.values(oddsValues).some(Boolean)&&!ahHomeOdds&&!ahAwayOdds){alert("Introduce al menos una cuota antes de analizar y guardar.");return;}
+let home=document.getElementById("home").value,away=document.getElementById("away").value,hd=getTeam("home"),ad=getTeam("away");
+let absH=getAbsences("home"),absA=getAbsences("away"),absHS={att:cappedImpact(absH,"att"),def:cappedImpact(absH,"def")},absAS={att:cappedImpact(absA,"att"),def:cappedImpact(absA,"def")};
+let eg=expGoals(hd,ad,+document.getElementById("leagueAvg").value||1.35,absHS,absAS),hl=eg.hl,al=eg.al,ps=probs(hl,al),dataConf=confidenceScore(hd,ad,absH,absA),rows=[];
+document.querySelectorAll("[data-odd]").forEach(el=>{if(el.value&&ps[el.dataset.odd]!=null){let odds=+el.value,sm=marketSensitivity(el.dataset.odd,odds,hl,al),s=score(ps[el.dataset.odd],odds,{...sm,dataConf});rows.push({...s,market:el.dataset.odd,odds})}});
+const homeLine=+(document.getElementById("homeAhLine")?.value||1),awayLine=-homeLine;
+if(ahHomeOdds){
+ const odds=+ahHomeOdds,st=asianHandicapStats(hl,al,"home",homeLine,odds),sm=asianSensitivity("home",homeLine,odds,hl,al);
+ rows.push(scoreAsian(st,odds,{...sm,dataConf},`AH · Local ${homeLine>0?"+":""}${homeLine}`));
+}
+if(ahAwayOdds){
+ const odds=+ahAwayOdds,st=asianHandicapStats(hl,al,"away",awayLine,odds),sm=asianSensitivity("away",awayLine,odds,hl,al);
+ rows.push(scoreAsian(st,odds,{...sm,dataConf},`AH · Visitante ${awayLine>0?"+":""}${awayLine}`));
+}
+rows.sort((a,b)=>b.vs-a.vs);
+let rec={id:editingRecordId||Date.now(),date:document.getElementById("date").value,league:document.getElementById("league").value,season:document.getElementById("season").value,leagueAvg:+document.getElementById("leagueAvg").value||1.35,home,away,hl,al,rows,result:null,notes:document.getElementById("notes").value,dataSource:document.getElementById("dataSource").value,absenceImpact:{home:absHS,away:absAS},absences:{home:absH,away:absA},teams:{home:hd,away:ad},odds:oddsValues,ah:{homeLine,homeOdds:ahHomeOdds,awayOdds:ahAwayOdds},diagnostics:eg.diag,dataConfidence:dataConf,version:"1.6"};
+let db=loadDB();
+if(editingRecordId){const idx=db.findIndex(x=>x.id===editingRecordId);if(idx>=0)db[idx]=rec;else db.unshift(rec);}else db.unshift(rec);
+saveDB(db);editingRecordId=null;clearDraft();renderResult(rec);resetFormToBlank();show("analysis");
+});
+function renderResult(r){
+let d=r.diagnostics;
+let h=`<div class="card result-capture-card"><div class="result-head"><h2>🎯 Resultado V1.6</h2><button type="button" class="download-result-btn" onclick="downloadResultCapture()">📸 Descargar resultado</button></div>
+<div class="summary">
+<div class="box"><b>${r.home}</b><br>λ goles: <b>${r.hl.toFixed(2)}</b><br>Ausencia ataque: ${r.absenceImpact.home.att.toFixed(0)}/100<br>Ausencia defensa: ${r.absenceImpact.home.def.toFixed(0)}/100</div>
+<div class="box"><b>${r.away}</b><br>λ goles: <b>${r.al.toFixed(2)}</b><br>Ausencia ataque: ${r.absenceImpact.away.att.toFixed(0)}/100<br>Ausencia defensa: ${r.absenceImpact.away.def.toFixed(0)}/100</div>
+</div>
+<p class="small muted">Confianza de datos: <b>${r.dataConfidence.toFixed(0)}/95</b>. Esta métrica evalúa completitud, muestras recientes y consistencia xG/GF; no equivale a probabilidad de acierto.</p>
+<div class="diag"><b>🔎 Diagnóstico del λ</b><table>
+<tr><th>Componente</th><th>Local</th><th>Visitante</th></tr>
+<tr><td>Ataque bruto</td><td>${d.Hatt.raw.toFixed(2)}</td><td>${d.Aatt.raw.toFixed(2)}</td></tr>
+<tr><td>Ataque ajustado</td><td>${d.Hatt.shrunk.toFixed(2)}</td><td>${d.Aatt.shrunk.toFixed(2)}</td></tr>
+<tr><td>Debilidad defensiva bruta</td><td>${d.Hdef.raw.toFixed(2)}</td><td>${d.Adef.raw.toFixed(2)}</td></tr>
+<tr><td>Debilidad defensiva ajustada</td><td>${d.Hdef.shrunk.toFixed(2)}</td><td>${d.Adef.shrunk.toFixed(2)}</td></tr>
+<tr><td>Base λ antes de ausencias/descanso</td><td>${d.baseH.toFixed(2)}</td><td>${d.baseA.toFixed(2)}</td></tr>
+<tr><td>Ajuste ataque por ausencias</td><td>${d.absenceHAtt.toFixed(3)}</td><td>${d.absenceAAtt.toFixed(3)}</td></tr>
+<tr><td>Ajuste defensa rival por ausencias</td><td>${d.absenceADef.toFixed(3)}</td><td>${d.absenceHDef.toFixed(3)}</td></tr>
+<tr><td>Ajuste descanso</td><td>${d.restHF.toFixed(3)}</td><td>${d.restAF.toFixed(3)}</td></tr>
+<tr><td><b>λ final</b></td><td><b>${r.hl.toFixed(2)}</b></td><td><b>${r.al.toFixed(2)}</b></td></tr>
+</table></div>
+<p class="small muted">El modelo V1.6 usa 70% xG/xGA y 30% GF/GA dentro de cada ventana disponible, pondera Últimos 10/Últimos 5/condición en 50%/30%/20%, redistribuye pesos si faltan datos y aplica regresión, localía, descanso y ausencias limitadas.</p>
+<div class="note" style="margin-top:10px"><b>Conf.</b> = confianza del modelo para ese mercado, separada del valor de la apuesta. <b>Robustez</b> = estabilidad del EV cuando λ local y visitante varían ±7%. <b>EV peor</b> = peor EV en esas cuatro combinaciones.</div><div class="result-grid"><table><tr><th>Pick</th><th>Prob.</th><th>Justa</th><th>Cuota</th><th>Edge</th><th>EV</th><th>Value</th><th>Conf.</th><th>Robustez</th><th>EV peor</th><th></th></tr>`;
+for(let x of r.rows)h+=`<tr class="${x.dec==='VALUE BET'?'good':x.dec==='WATCH'?'watch':'bad'}"><td>${marketLabel(x.market)}</td><td>${(x.p*100).toFixed(1)}%</td><td>${x.fair.toFixed(2)}</td><td>${x.odds.toFixed(2)}</td><td>${(x.ed*100).toFixed(1)}%</td><td>${(x.e*100).toFixed(1)}%</td><td>${x.vs.toFixed(0)}</td><td>${x.conf.toFixed(0)}</td><td>${x.robustness.toFixed(0)}</td><td>${(x.worstEV*100).toFixed(1)}%</td><td><b>${x.dec}</b></td></tr>`;
+h+="</table></div></div>";document.getElementById("result").innerHTML=h;
+}
+function show(id){["analysis","history","backup"].forEach(x=>document.getElementById(x).classList.toggle("hidden",x!==id));if(id==="history")renderHistory()}
+function renderHistory(){
+let db=loadDB(),settled=db.filter(x=>x.result),wins=settled.filter(x=>x.result==="win").length,loss=settled.filter(x=>x.result==="loss").length,pnl=settled.reduce((s,x)=>s+(x.pnl||0),0),stake=settled.length;
+document.getElementById("stats").innerHTML=`<span class="metric">Análisis: ${db.length}</span><span class="metric">Liquidados: ${settled.length}</span><span class="metric">Aciertos: ${wins}</span><span class="metric">Fallos: ${loss}</span><span class="metric">PnL: ${pnl.toFixed(2)}u</span><span class="metric">ROI: ${stake?(pnl/stake*100).toFixed(2):"0.00"}%</span>`;
+let h="<table><tr><th>Fecha</th><th>Partido</th><th>Mejor pick</th><th>Cuota</th><th>EV</th><th>Estado</th><th></th></tr>";
+db.forEach(r=>{let x=r.rows&&r.rows[0];h+=`<tr class="history-row" onclick="openHistoryDetail(${r.id})"><td>${r.date}</td><td><b>${r.home}</b> vs <b>${r.away}</b></td><td>${x?marketLabel(x.market):"-"}</td><td>${x?x.odds.toFixed(2):"-"}</td><td>${x?(x.e*100).toFixed(1)+"%":"-"}</td><td>${r.result||"Pendiente"}</td><td><button type="button" class="dangerBtn" onclick="event.stopPropagation();deleteRecord(${r.id})">🗑️</button> ${x?`<button type="button" onclick="event.stopPropagation();settle(${r.id})">Liquidar</button>`:""}</td></tr>`});
+h+="</table>";document.getElementById("historyTable").innerHTML=h||"<p class='muted'>Todavía no hay análisis guardados.</p>";
+}
+function fmt(v){return v==null||v===""?"—":(typeof v==="number"?v.toFixed(2):v)}
+function teamDetailTable(t,side){
+ const cond=side==="home"?"Últimos 5 casa":"Últimos 5 fuera";
+ let h=`<table><tr><th>Métrica</th><th>Últimos 10</th><th>Últimos 5</th><th>${cond}</th></tr>`;
+ for(const [k,l] of metrics)h+=`<tr><td>${l}</td><td>${fmt(t?.last10?.[k])}</td><td>${fmt(t?.last5?.[k])}</td><td>${fmt(t?.condition5?.[k])}</td></tr>`;
+ h+=`<tr><td>Días descanso</td><td colspan="3">${fmt(t?.restCurrent)}</td></tr>`;
+ return h+'</table>';
+}
+function absDetail(arr){if(!arr?.length)return '<p class="muted">Sin ausencias registradas.</p>';let h='<table><tr><th>Jugador</th><th>Estado</th><th>Ataque</th><th>Defensa</th></tr>';arr.forEach(x=>h+=`<tr><td>${x.name||'—'}</td><td>${x.status==='confirmed'?'Confirmada':x.status==='doubt'?'Duda':'Disponible'}</td><td>${fmt(x.att)}</td><td>${fmt(x.def)}</td></tr>`);return h+'</table>'}
+function oddsDetail(r){let h='<table><tr><th>Mercado</th><th>Cuota</th><th>Prob.</th><th>EV</th><th>Decisión</th></tr>';(r.rows||[]).forEach(x=>h+=`<tr class="${x.dec==='VALUE BET'?'good':x.dec==='WATCH'?'watch':'bad'}"><td>${marketLabel(x.market)}</td><td>${x.odds.toFixed(2)}</td><td>${(x.p*100).toFixed(1)}%</td><td>${(x.e*100).toFixed(1)}%</td><td>${x.dec}</td></tr>`);return h+'</table>'}
+function openHistoryDetail(id){
+ const r=loadDB().find(x=>x.id===id);if(!r)return;
+ document.getElementById('historyList').classList.add('hidden');const box=document.getElementById('historyDetail');box.classList.remove('hidden');
+ const d=r.diagnostics||{};
+ box.innerHTML=`<div class="card"><div class="detail-head"><div><h2 style="margin:0">📊 ${r.home} vs ${r.away}</h2><div class="muted">${r.date} · ${r.league||''} · ${r.season||''}</div>${r.preMatchLocked?'<span class="locked-badge">🔒 PREPARTIDO BLOQUEADO</span>':''}</div><div class="actions"><button type="button" onclick="downloadHistoryCapture(${r.id})">📸 Captura</button><button class="secondary" onclick="closeHistoryDetail()">← Volver</button></div></div>
+ <div class="detail-section"><h3>Resultado del modelo</h3><div class="summary"><div class="box"><b>${r.home}</b><br>λ: <b>${r.hl.toFixed(2)}</b><br>Ausencia ataque: ${r.absenceImpact?.home?.att?.toFixed(0)||0}/100<br>Ausencia defensa: ${r.absenceImpact?.home?.def?.toFixed(0)||0}/100</div><div class="box"><b>${r.away}</b><br>λ: <b>${r.al.toFixed(2)}</b><br>Ausencia ataque: ${r.absenceImpact?.away?.att?.toFixed(0)||0}/100<br>Ausencia defensa: ${r.absenceImpact?.away?.def?.toFixed(0)||0}/100</div></div><p class="small muted">Confianza de datos: <b>${(r.dataConfidence||0).toFixed(0)}/95</b></p></div>
+ <div class="detail-section"><h3>📋 Datos guardados — ${r.home}</h3>${teamDetailTable(r.teams?.home,"home")}</div>
+ <div class="detail-section"><h3>📋 Datos guardados — ${r.away}</h3>${teamDetailTable(r.teams?.away,"away")}</div>
+ <div class="detail-section"><h3>🩹 Ausencias</h3><b>${r.home}</b>${absDetail(r.absences?.home)}<b>${r.away}</b>${absDetail(r.absences?.away)}</div>
+ <div class="detail-section"><h3>🔎 Diagnóstico</h3><table><tr><th>Componente</th><th>${r.home}</th><th>${r.away}</th></tr><tr><td>Ataque bruto</td><td>${fmt(d.Hatt?.raw)}</td><td>${fmt(d.Aatt?.raw)}</td></tr><tr><td>Ataque ajustado</td><td>${fmt(d.Hatt?.shrunk)}</td><td>${fmt(d.Aatt?.shrunk)}</td></tr><tr><td>Defensa bruta</td><td>${fmt(d.Hdef?.raw)}</td><td>${fmt(d.Adef?.raw)}</td></tr><tr><td>Defensa ajustada</td><td>${fmt(d.Hdef?.shrunk)}</td><td>${fmt(d.Adef?.shrunk)}</td></tr><tr><td>Base λ</td><td>${fmt(d.baseH)}</td><td>${fmt(d.baseA)}</td></tr><tr><td>λ final</td><td><b>${r.hl.toFixed(2)}</b></td><td><b>${r.al.toFixed(2)}</b></td></tr></table></div>
+ <div class="detail-section"><h3>💰 Cuotas y mercados</h3>${oddsDetail(r)}</div>
+ <div class="detail-section"><h3>🔎 Fuente de datos</h3><div class="note">${r.dataSource||'No registrada.'}</div></div><div class="detail-section"><h3>📝 Notas</h3><div class="note">${r.notes||'Sin notas.'}</div></div>
+ <div class="actions" style="margin-top:12px"><button type="button" onclick="loadRecordIntoForm(${r.id})">✏️ Cargar en formulario</button>${r.rows?.length?`<button type="button" class="secondary" onclick="settle(${r.id})">Liquidar pick principal</button>`:''}<button type="button" class="dangerBtn" onclick="deleteRecord(${r.id})">🗑️ Borrar este partido</button></div>
+ </div>`;
+}
+function closeHistoryDetail(){document.getElementById('historyDetail').classList.add('hidden');document.getElementById('historyList').classList.remove('hidden')}
+function loadRecordIntoForm(id){
+ const r=loadDB().find(x=>x.id===id);if(!r)return;
+ editingRecordId=r.id;
+ const savedOdds=r.odds||Object.fromEntries((r.rows||[]).map(x=>[x.market,x.odds]));
+ const d={date:r.date,league:r.league,season:r.season,leagueAvg:r.leagueAvg||'',dataSource:r.dataSource||'',home:r.home,away:r.away,notes:r.notes||'',teams:r.teams,absences:r.absences,odds:savedOdds,ah:r.ah||null};
+ localStorage.setItem(DRAFT_KEY,JSON.stringify(d));
+ document.getElementById('result').innerHTML='';
+ closeHistoryDetail();show('analysis');restoreDraft();setDraftStatus('✏️ Análisis cargado: cuotas y datos recuperados. Puedes editar y volver a analizar.');
+}
+function settle(id){let db=loadDB(),r=db.find(x=>x.id===id);if(!r||!r.rows||!r.rows.length)return;let x=r.rows[0],res=prompt("Resultado: WIN, LOSS o PUSH","WIN");if(!res)return;res=res.toLowerCase();if(!["win","loss","push"].includes(res))return alert("Resultado inválido");r.result=res;r.pnl=res==="win"?x.odds-1:res==="loss"?-1:0;saveDB(db);renderHistory();openHistoryDetail(id)}
+function deleteRecord(id){const db=loadDB(),r=db.find(x=>x.id===id);if(!r)return;if(!confirm(`¿Borrar del historial "${r.home} vs ${r.away}"?\n\nEsta acción no se puede deshacer.`))return;saveDB(db.filter(x=>x.id!==id));closeHistoryDetail();renderHistory()}
+function clearCurrentForm(){if(confirm("¿Limpiar todos los datos del formulario?")){resetFormToBlank();document.getElementById("result").innerHTML="";editingRecordId=null}}
+function exportData(){let b=new Blob([JSON.stringify(loadDB(),null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="SoyJordan_Picks_V1_6_Backup.json";a.click();document.getElementById("dataMsg").textContent="Backup V1.6 exportado."}
+function importData(e){let f=e.target.files[0];if(!f)return;let rd=new FileReader();rd.onload=()=>{try{let incoming=JSON.parse(rd.result);if(!Array.isArray(incoming))throw Error();const current=loadDB();const byId=new Map(current.map(x=>[String(x.id),x]));let added=0,updated=0;incoming.forEach(x=>{if(!x||x.id==null)return;const key=String(x.id);if(byId.has(key))updated++;else added++;byId.set(key,x)});const merged=[...byId.values()].sort((a,b)=>(Number(b.id)||0)-(Number(a.id)||0));saveDB(merged);document.getElementById("dataMsg").textContent=`Backup importado: ${added} nuevos, ${updated} actualizados. Total en historial: ${merged.length}.`;document.getElementById("importFile").value="";show("history");renderHistory()}catch{document.getElementById("dataMsg").textContent="Archivo no válido.";document.getElementById("importFile").value=""}};rd.readAsText(f)}
+function clearAll(){if(confirm("¿Borrar todo el historial de este iPhone?")){localStorage.removeItem("valuePickDB");renderHistory();document.getElementById("dataMsg").textContent="Historial borrado."}}
+document.getElementById("form").addEventListener("input",()=>{document.getElementById("result").innerHTML="";queueDraftSave()});
+document.getElementById("form").addEventListener("change",()=>{document.getElementById("result").innerHTML="";queueDraftSave()});
+window.addEventListener("beforeunload",saveDraftNow);
+setTimeout(()=>{if(hasDraft())restoreDraft();else saveDraftNow()},250);
+
+// ==================== V1.6.1 · BANK / APUESTAS / COMBINADAS ====================
+const BANK_KEY="sjBankV161", BETS_KEY="sjBetsV161", COMBOS_KEY="sjCombosV161";
+let comboBuilder=[];
+
+function money(v){
+  const n=Number(v)||0;
+  return "$"+Math.round(n).toLocaleString("es-CO");
+}
+function loadBank(){
+  try{return JSON.parse(localStorage.getItem(BANK_KEY))||{initial:0,adjustments:[]}}catch{return {initial:0,adjustments:[]}}
+}
+function saveBank(b){localStorage.setItem(BANK_KEY,JSON.stringify(b));renderBank()}
+function loadBets(){try{return JSON.parse(localStorage.getItem(BETS_KEY))||[]}catch{return []}}
+function saveBets(x){localStorage.setItem(BETS_KEY,JSON.stringify(x));renderBank()}
+function loadCombos(){try{return JSON.parse(localStorage.getItem(COMBOS_KEY))||[]}catch{return []}}
+function saveCombos(x){localStorage.setItem(COMBOS_KEY,JSON.stringify(x));renderBank()}
+
+function financeSummary(){
+  const bank=loadBank(),bets=loadBets(),combos=loadCombos();
+  const adj=(bank.adjustments||[]).reduce((s,x)=>s+(Number(x.amount)||0),0);
+  const betPnl=bets.reduce((s,x)=>s+(x.status!=="pending"?(Number(x.pnl)||0):0),0);
+  const comboPnl=combos.reduce((s,x)=>s+(x.status!=="pending"?(Number(x.pnl)||0):0),0);
+  const pending=bets.filter(x=>x.status==="pending").reduce((s,x)=>s+(Number(x.stake)||0),0)
+    +combos.filter(x=>x.status==="pending").reduce((s,x)=>s+(Number(x.stake)||0),0);
+  const current=(Number(bank.initial)||0)+adj+betPnl+comboPnl;
+  return {initial:Number(bank.initial)||0,adj,betPnl,comboPnl,pnl:betPnl+comboPnl,current,pending,available:current-pending};
+}
+function renderBank(){
+  const s=financeSummary();
+  const a=document.getElementById("bankInitialDisplay"),b=document.getElementById("bankCurrentDisplay"),c=document.getElementById("bankPendingDisplay"),d=document.getElementById("bankAvailableDisplay"),p=document.getElementById("bankPnlText");
+  if(a)a.textContent=money(s.initial);if(b)b.textContent=money(s.current);if(c)c.textContent=money(s.pending);if(d)d.textContent=money(s.available);
+  if(p){p.textContent=`P&L realizado: ${money(s.pnl)}`;p.className="small "+(s.pnl>=0?"money-positive":"money-negative")}
+}
+function setInitialBank(){
+  const b=loadBank(),v=prompt("Bank inicial:",String(b.initial||0));if(v===null)return;
+  const n=Number(String(v).replace(/[^\d.-]/g,""));if(!Number.isFinite(n)||n<0)return alert("Valor inválido.");
+  b.initial=n;saveBank(b);
+}
+function adjustBank(){
+  const raw=prompt("Escribe el ajuste. Positivo = ingreso; negativo = retiro.\nEj.: 50000 o -20000","0");if(raw===null)return;
+  const n=Number(String(raw).replace(/[^\d.-]/g,""));if(!Number.isFinite(n)||n===0)return alert("Valor inválido.");
+  const note=prompt("Nota del ajuste (opcional):","")||"";
+  const b=loadBank();b.adjustments=b.adjustments||[];b.adjustments.push({id:Date.now(),amount:n,note,date:new Date().toISOString()});saveBank(b);
+}
+
+function analysisPickOptions(r){
+  return (r.rows||[]).map((x,i)=>({index:i,label:marketLabel(x.market),odds:Number(x.odds)||0,ev:Number(x.e)||0,decision:x.dec||""}));
+}
+function registerBet(analysisId){
+  const r=loadDB().find(x=>x.id===analysisId);if(!r||!r.rows?.length)return alert("No hay picks disponibles.");
+  const options=analysisPickOptions(r);
+  const text=options.map((x,i)=>`${i+1}. ${x.label} @ ${x.odds.toFixed(2)} · EV ${(x.ev*100).toFixed(1)}% · ${x.decision}`).join("\n");
+  const sel=prompt("Selecciona el número del pick que realmente apostaste:\n\n"+text,"1");if(sel===null)return;
+  const idx=Number(sel)-1;if(!Number.isInteger(idx)||idx<0||idx>=options.length)return alert("Selección inválida.");
+  const pick=options[idx];
+  const stakeRaw=prompt("Monto apostado:", "50000");if(stakeRaw===null)return;
+  const stake=Number(String(stakeRaw).replace(/[^\d.-]/g,""));if(!Number.isFinite(stake)||stake<=0)return alert("Monto inválido.");
+  const oddsRaw=prompt("Cuota realmente tomada:",pick.odds.toFixed(2));if(oddsRaw===null)return;
+  const odds=Number(oddsRaw);if(!Number.isFinite(odds)||odds<=1)return alert("Cuota inválida.");
+  const unitRaw=prompt("Valor de 1 unidad (opcional, deja 0 si no usas unidades):","0");if(unitRaw===null)return;
+  const unit=Number(String(unitRaw).replace(/[^\d.-]/g,""))||0;
+  const bets=loadBets();
+  bets.unshift({id:Date.now(),analysisId:r.id,date:r.date,home:r.home,away:r.away,market:r.rows[idx].market,label:pick.label,odds,stake,units:unit>0?stake/unit:null,status:"pending",pnl:0,createdAt:new Date().toISOString()});
+  saveBets(bets);renderHistory();openHistoryDetail(r.id);
+}
+function settleBet(betId){
+  const bets=loadBets(),b=bets.find(x=>x.id===betId);if(!b)return;
+  const res=(prompt("Resultado de la apuesta: WIN, LOSS o PUSH",b.status==="pending"?"WIN":b.status.toUpperCase())||"").trim().toLowerCase();
+  if(!["win","loss","push"].includes(res))return alert("Resultado inválido.");
+  b.status=res;b.pnl=res==="win"?b.stake*(b.odds-1):res==="loss"?-b.stake:0;b.settledAt=new Date().toISOString();
+  saveBets(bets);renderHistory();openHistoryDetail(b.analysisId);
+}
+function deleteBet(betId){
+  if(!confirm("¿Borrar esta apuesta registrada?"))return;
+  const bets=loadBets(),b=bets.find(x=>x.id===betId),analysisId=b?.analysisId;
+  saveBets(bets.filter(x=>x.id!==betId));renderHistory();if(analysisId)openHistoryDetail(analysisId);
+}
+function betsForAnalysis(id){return loadBets().filter(x=>x.analysisId===id)}
+function betStatusLabel(s){return s==="win"?"GANADA":s==="loss"?"PERDIDA":s==="push"?"NULA / PUSH":"PENDIENTE"}
+function betDetailHtml(id){
+  const bets=betsForAnalysis(id);
+  if(!bets.length)return '<p class="muted">No hay apuestas reales registradas para este análisis.</p>';
+  return bets.map(b=>`<div class="bet-card"><b>${b.label}</b> @ ${b.odds.toFixed(2)}<br>
+    Stake: <b>${money(b.stake)}</b>${b.units!=null?` · ${b.units.toFixed(2)}u`:""}<br>
+    Estado: <span class="bet-status status-${b.status}">${betStatusLabel(b.status)}</span><br>
+    P&L: <span class="${b.pnl>=0?"money-positive":"money-negative"}">${money(b.pnl||0)}</span>
+    <div class="actions" style="margin-top:7px"><button type="button" onclick="settleBet(${b.id})">Liquidar / editar</button><button type="button" class="dangerBtn" onclick="deleteBet(${b.id})">🗑️</button></div>
+  </div>`).join("");
+}
+
+// ---------- COMBINADAS ----------
+function refreshComboAnalysisOptions(){
+  const sel=document.getElementById("comboAnalysisSelect");if(!sel)return;
+  const db=loadDB();
+  sel.innerHTML=db.length?db.map(r=>`<option value="${r.id}">${r.date||""} · ${r.home} vs ${r.away}</option>`).join(""):'<option value="">Sin análisis</option>';
+  refreshComboPickOptions();
+}
+function refreshComboPickOptions(){
+  const a=Number(document.getElementById("comboAnalysisSelect")?.value),sel=document.getElementById("comboPickSelect");if(!sel)return;
+  const r=loadDB().find(x=>x.id===a);if(!r){sel.innerHTML='<option value="">Sin picks</option>';return}
+  sel.innerHTML=(r.rows||[]).map((x,i)=>`<option value="${i}">${marketLabel(x.market)} @ ${Number(x.odds).toFixed(2)} · ${(Number(x.e)*100).toFixed(1)}% EV</option>`).join("");
+}
+function addComboLeg(){
+  const analysisId=Number(document.getElementById("comboAnalysisSelect")?.value),rowIndex=Number(document.getElementById("comboPickSelect")?.value);
+  const r=loadDB().find(x=>x.id===analysisId),x=r?.rows?.[rowIndex];if(!r||!x)return alert("Selecciona un pick.");
+  if(comboBuilder.some(l=>l.analysisId===analysisId&&l.rowIndex===rowIndex))return alert("Ese pick ya está en la combinada.");
+  comboBuilder.push({analysisId,rowIndex,date:r.date,home:r.home,away:r.away,market:x.market,label:marketLabel(x.market),odds:Number(x.odds)});
+  renderComboBuilder();
+}
+function removeComboLeg(i){comboBuilder.splice(i,1);renderComboBuilder()}
+function comboOdds(legs){return legs.reduce((p,x)=>p*(Number(x.odds)||1),1)}
+function renderComboBuilder(){
+  const box=document.getElementById("comboBuilderLegs");if(!box)return;
+  box.innerHTML=comboBuilder.length?comboBuilder.map((l,i)=>`<div class="combo-leg"><span><b>${l.label}</b> · ${l.home} vs ${l.away} @ ${l.odds.toFixed(2)}</span><button type="button" class="dangerBtn" onclick="removeComboLeg(${i})">×</button></div>`).join(""):'<p class="muted">Todavía no agregaste selecciones.</p>';
+  const odds=comboOdds(comboBuilder),stake=Number(document.getElementById("comboStake")?.value)||0;
+  const o=document.getElementById("comboCombinedOdds"),ret=document.getElementById("comboPotentialReturn");if(o)o.textContent=odds.toFixed(2);if(ret)ret.textContent=money(stake*odds);
+}
+function clearComboBuilder(){comboBuilder=[];if(document.getElementById("comboStake"))document.getElementById("comboStake").value="";if(document.getElementById("comboName"))document.getElementById("comboName").value="";renderComboBuilder()}
+function saveCombo(){
+  if(comboBuilder.length<2)return alert("Una combinada necesita al menos 2 selecciones.");
+  const stake=Number(document.getElementById("comboStake")?.value)||0;if(stake<=0)return alert("Introduce el monto apostado.");
+  const name=document.getElementById("comboName")?.value.trim()||`Combinada ${new Date().toLocaleDateString("es-CO")}`;
+  const c={id:Date.now(),name,legs:JSON.parse(JSON.stringify(comboBuilder)),originalOdds:comboOdds(comboBuilder),stake,status:"pending",pnl:0,createdAt:new Date().toISOString()};
+  const combos=loadCombos();combos.unshift(c);saveCombos(combos);clearComboBuilder();renderCombos();
+}
+function settleCombo(id){
+  const combos=loadCombos(),c=combos.find(x=>x.id===id);if(!c)return;
+  let hasLoss=false,allPush=true,effectiveOdds=1,statuses=[];
+  for(const leg of c.legs){
+    const raw=(prompt(`Resultado de:\n${leg.label} · ${leg.home} vs ${leg.away}\n\nWIN / LOSS / PUSH`,"WIN")||"").trim().toLowerCase();
+    if(!["win","loss","push"].includes(raw))return alert("Liquidación cancelada: resultado inválido.");
+    statuses.push(raw);
+    if(raw==="loss")hasLoss=true;
+    if(raw==="win"){allPush=false;effectiveOdds*=Number(leg.odds)||1}
+  }
+  c.legResults=statuses;c.effectiveOdds=effectiveOdds;
+  if(hasLoss){c.status="loss";c.pnl=-c.stake}
+  else if(allPush){c.status="push";c.pnl=0}
+  else{c.status="win";c.pnl=c.stake*(effectiveOdds-1)}
+  c.settledAt=new Date().toISOString();saveCombos(combos);renderCombos();
+}
+function deleteCombo(id){if(!confirm("¿Borrar esta combinada?"))return;saveCombos(loadCombos().filter(x=>x.id!==id));renderCombos()}
+function renderCombos(){
+  refreshComboAnalysisOptions();renderComboBuilder();
+  const combos=loadCombos(),list=document.getElementById("comboList"),stats=document.getElementById("comboStats");if(!list||!stats)return;
+  const settled=combos.filter(x=>x.status!=="pending"),pnl=settled.reduce((s,x)=>s+(Number(x.pnl)||0),0),staked=settled.reduce((s,x)=>s+(Number(x.stake)||0),0);
+  stats.innerHTML=`<span class="metric">Combinadas: ${combos.length}</span><span class="metric">P&L: ${money(pnl)}</span><span class="metric">ROI: ${staked?(pnl/staked*100).toFixed(1):"0.0"}%</span>`;
+  list.innerHTML=combos.length?combos.map(c=>`<div class="combo-card"><b>${c.name}</b><br>
+    ${c.legs.map((l,i)=>`${i+1}. ${l.label} · ${l.home} vs ${l.away} @ ${l.odds.toFixed(2)}${c.legResults?` — ${betStatusLabel(c.legResults[i])}`:""}`).join("<br>")}
+    <hr><b>Cuota:</b> ${Number(c.originalOdds).toFixed(2)}${c.effectiveOdds?` · Efectiva ${Number(c.effectiveOdds).toFixed(2)}`:""} · <b>Stake:</b> ${money(c.stake)}<br>
+    Estado: <span class="bet-status status-${c.status}">${betStatusLabel(c.status)}</span> · P&L: <span class="${c.pnl>=0?"money-positive":"money-negative"}">${money(c.pnl||0)}</span>
+    <div class="actions" style="margin-top:7px">${c.status==="pending"?`<button type="button" onclick="settleCombo(${c.id})">Liquidar combinada</button>`:`<button type="button" class="secondary" onclick="settleCombo(${c.id})">Editar liquidación</button>`}<button type="button" class="dangerBtn" onclick="deleteCombo(${c.id})">🗑️</button></div>
+  </div>`).join(""):'<p class="muted">Todavía no hay combinadas guardadas.</p>';
+  renderBank();
+}
+
+// ---------- OVERRIDES V1.6.1 ----------
+function show(id){
+  ["analysis","history","combos","backup"].forEach(x=>document.getElementById(x)?.classList.toggle("hidden",x!==id));
+  if(id==="history")renderHistory();
+  if(id==="combos")renderCombos();
+}
+function renderHistory(){
+  const db=loadDB(),bets=loadBets();
+  const settled=bets.filter(x=>x.status!=="pending"),wins=settled.filter(x=>x.status==="win").length,loss=settled.filter(x=>x.status==="loss").length,push=settled.filter(x=>x.status==="push").length;
+  const pnl=settled.reduce((s,x)=>s+(Number(x.pnl)||0),0),staked=settled.reduce((s,x)=>s+(Number(x.stake)||0),0),hit=(wins+loss)?wins/(wins+loss)*100:0;
+  document.getElementById("stats").innerHTML=`<span class="metric">Análisis: ${db.length}</span><span class="metric">Apuestas: ${bets.length}</span><span class="metric">Ganadas: ${wins}</span><span class="metric">Perdidas: ${loss}</span><span class="metric">Nulas: ${push}</span><span class="metric">Acierto: ${hit.toFixed(1)}%</span><span class="metric">P&L: ${money(pnl)}</span><span class="metric">ROI: ${staked?(pnl/staked*100).toFixed(1):"0.0"}%</span>`;
+  let h="<table><tr><th>Fecha</th><th>Partido</th><th>Mejor pick</th><th>Cuota</th><th>EV</th><th>Apuestas</th><th></th></tr>";
+  db.forEach(r=>{const x=r.rows&&r.rows[0],rb=betsForAnalysis(r.id);h+=`<tr class="history-row" onclick="openHistoryDetail(${r.id})"><td>${r.date}</td><td><b>${r.home}</b> vs <b>${r.away}</b></td><td>${x?marketLabel(x.market):"-"}</td><td>${x?Number(x.odds).toFixed(2):"-"}</td><td>${x?(Number(x.e)*100).toFixed(1)+"%":"-"}</td><td>${rb.length}</td><td><button type="button" onclick="event.stopPropagation();registerBet(${r.id})">+ Apuesta</button> <button type="button" class="dangerBtn" onclick="event.stopPropagation();deleteRecord(${r.id})">🗑️</button></td></tr>`});
+  document.getElementById("historyTable").innerHTML=h+"</table>";
+  renderBank();
+}
+const _openHistoryDetailV16=openHistoryDetail;
+openHistoryDetail=function(id){
+  _openHistoryDetailV16(id);
+  const box=document.getElementById("historyDetail");
+  const card=box?.querySelector(".card");if(!card)return;
+  const actions=card.querySelector(".actions");
+  const betting=document.createElement("div");betting.className="detail-section";
+  betting.innerHTML=`<h3>🎟️ Apuestas reales</h3>${betDetailHtml(id)}<button type="button" onclick="registerBet(${id})">+ Registrar apuesta sobre un pick</button>`;
+  if(actions)card.insertBefore(betting,actions);else card.appendChild(betting);
+  // Oculta el viejo botón de liquidar pick principal para evitar doble contabilidad.
+  [...card.querySelectorAll("button")].filter(b=>b.textContent.includes("Liquidar pick principal")).forEach(b=>b.style.display="none");
+}
+settle=function(id){registerBet(id)};
+
+function exportData(){
+  const payload={format:"SoyJordan Picks Backup",version:"1.6.2.5",exportedAt:new Date().toISOString(),analyses:loadDB(),bets:loadBets(),combos:loadCombos(),bank:loadBank()};
+  const b=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="SoyJordan_Picks_V1_6_2_5_Backup.json";a.click();document.getElementById("dataMsg").textContent="Backup V1.6.2.5 exportado.";
+}
+function importData(e){
+  const f=e.target.files[0];if(!f)return;const rd=new FileReader();
+  rd.onload=()=>{try{
+    const incoming=JSON.parse(rd.result);
+    // Compatibilidad: backups antiguos eran solo un array de análisis.
+    const analyses=Array.isArray(incoming)?incoming:(incoming.analyses||[]);
+    if(!Array.isArray(analyses))throw Error();
+    const current=loadDB(),byId=new Map(current.map(x=>[String(x.id),x]));analyses.forEach(x=>{if(x?.id!=null)byId.set(String(x.id),x)});saveDB([...byId.values()].sort((a,b)=>(Number(b.id)||0)-(Number(a.id)||0)));
+    if(!Array.isArray(incoming)){
+      if(Array.isArray(incoming.bets)){const m=new Map(loadBets().map(x=>[String(x.id),x]));incoming.bets.forEach(x=>x?.id!=null&&m.set(String(x.id),x));saveBets([...m.values()])}
+      if(Array.isArray(incoming.combos)){const m=new Map(loadCombos().map(x=>[String(x.id),x]));incoming.combos.forEach(x=>x?.id!=null&&m.set(String(x.id),x));saveCombos([...m.values()])}
+      if(incoming.bank&&typeof incoming.bank==="object")saveBank(incoming.bank);
+    }
+    document.getElementById("dataMsg").textContent=`Backup importado. Análisis: ${loadDB().length} · Apuestas: ${loadBets().length} · Combinadas: ${loadCombos().length}.`;
+    document.getElementById("importFile").value="";renderBank();show("history");
+  }catch{document.getElementById("dataMsg").textContent="Archivo no válido.";document.getElementById("importFile").value=""}};
+  rd.readAsText(f);
+}
+function clearAll(){
+  if(confirm("¿Borrar análisis, apuestas, combinadas y datos del bank de este iPhone?")){
+    localStorage.removeItem("valuePickDB");localStorage.removeItem(BETS_KEY);localStorage.removeItem(COMBOS_KEY);localStorage.removeItem(BANK_KEY);
+    renderBank();renderHistory();document.getElementById("dataMsg").textContent="Todos los datos fueron borrados.";
+  }
+}
+setTimeout(()=>{renderBank();refreshComboAnalysisOptions();},300);
+
+
+// ==================== V1.6.2.1 · UX / CAPTURA / BLOQUEO ====================
+let betModalState={analysisId:null,rowIndex:0};
+function openBetModal(analysisId){
+  const r=loadDB().find(x=>x.id===analysisId);if(!r||!r.rows?.length)return alert("No hay picks disponibles.");
+  betModalState={analysisId,rowIndex:0};
+  document.getElementById("betModalTitle").textContent=`${r.home} vs ${r.away}`;
+  document.getElementById("betPickGrid").innerHTML=(r.rows||[]).map((x,i)=>{
+    const cls=x.dec==="VALUE BET"?"good":x.dec==="WATCH"?"watch":"bad";
+    return `<div class="pick-option ${cls} ${i===0?'selected':''}" onclick="selectBetPick(${i})" data-pick-index="${i}"><div class="pick-option-row"><div><div class="pick-name">${marketLabel(x.market)}</div><div class="mini">${x.dec||''}</div></div><div class="pick-metric"><div class="mini">Prob.</div><b>${(Number(x.p)*100).toFixed(1)}%</b></div><div class="pick-metric"><div class="mini">EV</div><b>${(Number(x.e)*100).toFixed(1)}%</b></div><div class="pick-metric"><div class="mini">Conf.</div><b>${Number(x.conf||0).toFixed(0)}</b></div><div><div class="mini">Cuota</div><b>${Number(x.odds).toFixed(2)}</b></div></div></div>`;
+  }).join("");
+  document.getElementById("betOddsInput").value=Number(r.rows[0].odds).toFixed(2);
+  document.getElementById("betModal").classList.remove("hidden");document.body.style.overflow="hidden";
+}
+function closeBetModal(){document.getElementById("betModal").classList.add("hidden");document.body.style.overflow=""}
+function selectBetPick(i){
+  betModalState.rowIndex=i;document.querySelectorAll("#betPickGrid .pick-option").forEach((el,n)=>el.classList.toggle("selected",n===i));
+  const r=loadDB().find(x=>x.id===betModalState.analysisId);if(r?.rows?.[i])document.getElementById("betOddsInput").value=Number(r.rows[i].odds).toFixed(2);
+}
+function confirmBetFromModal(){
+  const r=loadDB().find(x=>x.id===betModalState.analysisId),idx=betModalState.rowIndex;if(!r||!r.rows?.[idx])return;
+  const row=r.rows[idx],stake=Number(document.getElementById("betStakeInput").value),odds=Number(document.getElementById("betOddsInput").value),unit=Number(document.getElementById("betUnitInput").value)||0;
+  if(!Number.isFinite(stake)||stake<=0)return alert("Monto inválido.");if(!Number.isFinite(odds)||odds<=1)return alert("Cuota inválida.");
+  const pick=analysisPickOptions(r)[idx],bets=loadBets();
+  bets.unshift({id:Date.now(),analysisId:r.id,date:r.date,home:r.home,away:r.away,market:row.market,label:pick.label,odds,stake,units:unit>0?stake/unit:null,status:"pending",pnl:0,createdAt:new Date().toISOString(),preMatchSnapshot:{modelVersion:r.version||"1.6",lambdaHome:r.hl,lambdaAway:r.al,prob:row.p,ev:row.e,confidence:row.conf,robustness:row.robustness,worstEV:row.worstEV,decision:row.dec}});
+  saveBets(bets);
+  const db=loadDB(),rec=db.find(x=>x.id===r.id);if(rec){rec.preMatchLocked=true;rec.lockedAt=new Date().toISOString();rec.lockedBetId=bets[0].id;saveDB(db)}
+  closeBetModal();renderHistory();openHistoryDetail(r.id);
+}
+registerBet=openBetModal;
+
+const _loadRecordIntoFormV162=loadRecordIntoForm;
+loadRecordIntoForm=function(id){const r=loadDB().find(x=>x.id===id);if(r?.preMatchLocked)return alert("🔒 Este análisis está bloqueado como registro prepartido y no puede editarse. Crea un análisis nuevo si necesitas probar otros datos.");return _loadRecordIntoFormV162(id)};
+
+function renderHistory(){
+  const db=loadDB(),bets=loadBets();
+  const settled=bets.filter(x=>x.status!=="pending"),wins=settled.filter(x=>x.status==="win").length,loss=settled.filter(x=>x.status==="loss").length,push=settled.filter(x=>x.status==="push").length;
+  const pnl=settled.reduce((s,x)=>s+(Number(x.pnl)||0),0),staked=settled.reduce((s,x)=>s+(Number(x.stake)||0),0),hit=(wins+loss)?wins/(wins+loss)*100:0;
+  document.getElementById("stats").innerHTML=`<span class="metric">Análisis: ${db.length}</span><span class="metric">Apuestas: ${bets.length}</span><span class="metric">Ganadas: ${wins}</span><span class="metric">Perdidas: ${loss}</span><span class="metric">Nulas: ${push}</span><span class="metric">Acierto: ${hit.toFixed(1)}%</span><span class="metric">P&L: ${money(pnl)}</span><span class="metric">ROI: ${staked?(pnl/staked*100).toFixed(1):"0.0"}%</span>`;
+  const html=db.map(r=>{const x=r.rows?.[0],rb=betsForAnalysis(r.id),pending=rb.filter(b=>b.status==="pending").length;return `<div class="history-card" onclick="openHistoryDetail(${r.id})"><div class="history-card-top"><div><div class="history-date">${r.date||''} · ${r.league||''}</div><div class="history-match">${r.home} <span class="muted">vs</span> ${r.away}</div></div><div>${r.preMatchLocked?'<span class="status-chip locked">🔒 BLOQUEADO</span>':pending?'<span class="status-chip pending">PENDIENTE</span>':''}</div></div>${x?`<div class="history-pick"><div><small>MEJOR PICK DEL MODELO</small><br><b>${marketLabel(x.market)}</b></div><div style="text-align:right"><small>Cuota · EV</small><br><b>${Number(x.odds).toFixed(2)} · ${(Number(x.e)*100).toFixed(1)}%</b></div></div>`:''}<div class="history-card-actions"><button type="button" onclick="event.stopPropagation();openBetModal(${r.id})">+ Registrar apuesta</button><button type="button" class="secondary" onclick="event.stopPropagation();downloadHistoryCapture(${r.id})">📸 Captura</button><button type="button" class="dangerBtn" onclick="event.stopPropagation();deleteRecord(${r.id})">🗑️</button></div>${rb.length?`<div class="small muted" style="margin-top:6px">${rb.length} apuesta(s) registrada(s) · ${pending} pendiente(s)</div>`:''}</div>`}).join("");
+  document.getElementById("historyTable").innerHTML=`<div class="history-cards">${html||'<p class="muted">Todavía no hay análisis guardados.</p>'}</div>`;renderBank();
+}
+
+const _renderBankV162=renderBank;
+renderBank=function(){_renderBankV162();const s=financeSummary(),p=document.getElementById("bankPnlCompact");if(p){p.textContent=money(s.pnl);p.className=s.pnl>=0?"money-positive":"money-negative"}}
+
+function ensureCapturePreview(){
+  let m=document.getElementById('capturePreviewModal');if(m)return m;
+  m=document.createElement('div');m.id='capturePreviewModal';m.className='modal';m.style.display='none';
+  m.innerHTML=`<div class="modal-sheet" style="max-width:720px"><div class="detail-head"><div><h2 style="margin:0">📸 Captura generada</h2><div class="small muted">En iPhone pulsa “Compartir / Guardar” y luego “Guardar imagen” o “Guardar en Archivos”.</div></div><button class="secondary" type="button" onclick="closeCapturePreview()">✕</button></div><div style="max-height:62vh;overflow:auto;background:#eee;border-radius:12px;padding:8px"><img id="capturePreviewImg" style="display:block;width:100%;height:auto;border-radius:8px" alt="Captura SoyJordan Picks"></div><div class="actions" style="margin-top:10px"><button id="captureShareBtn" type="button">📤 Compartir / Guardar</button><button id="captureDownloadBtn" class="secondary" type="button">⬇️ Descargar PNG</button></div></div>`;
+  document.body.appendChild(m);return m;
+}
+function closeCapturePreview(){const m=document.getElementById('capturePreviewModal');if(m)m.style.display='none'}
+function dataUrlToBlob(dataUrl){
+  const parts=dataUrl.split(','),meta=parts[0]||'',b64=parts[1]||'';
+  const mime=(meta.match(/data:([^;]+)/)||[])[1]||'image/png';
+  const bin=atob(b64),len=bin.length,arr=new Uint8Array(len);
+  for(let i=0;i<len;i++)arr[i]=bin.charCodeAt(i);
+  return new Blob([arr],{type:mime});
+}
+function showCapturePreview(dataUrl,filename){
+  const m=ensureCapturePreview(),img=m.querySelector('#capturePreviewImg'),share=m.querySelector('#captureShareBtn'),down=m.querySelector('#captureDownloadBtn');
+  img.src=dataUrl;m.style.display='flex';
+
+  share.onclick=async()=>{
+    try{
+      const blob=dataUrlToBlob(dataUrl);
+      let file=null;
+      try{file=new File([blob],filename,{type:'image/png'})}catch(e){}
+      if(file&&navigator.share&&(!navigator.canShare||navigator.canShare({files:[file]}))){
+        await navigator.share({files:[file],title:'SoyJordan Picks'});
+      }else{
+        const w=window.open();
+        if(w){w.document.write(`<title>${filename}</title><img src="${dataUrl}" style="max-width:100%;height:auto">`);w.document.close();}
+        else location.href=dataUrl;
+      }
+    }catch(e){
+      console.error('share capture',e);
+      const w=window.open();
+      if(w){w.document.write(`<title>${filename}</title><img src="${dataUrl}" style="max-width:100%;height:auto">`);w.document.close();}
+    }
+  };
+
+  down.onclick=()=>{
+    try{
+      const a=document.createElement('a');
+      a.href=dataUrl;a.download=filename;a.rel='noopener';
+      document.body.appendChild(a);a.click();a.remove();
+    }catch(e){
+      console.error('download capture',e);
+      const w=window.open();
+      if(w){w.document.write(`<title>${filename}</title><img src="${dataUrl}" style="max-width:100%;height:auto">`);w.document.close();}
+    }
+  };
+}
+function roundRect(ctx,x,y,w,h,r,fill,stroke){
+  r=Math.min(r,w/2,h/2);ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();if(fill){ctx.fillStyle=fill;ctx.fill()}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1.5;ctx.stroke()}
+}
+function fitText(ctx,text,maxWidth){text=String(text??'');if(ctx.measureText(text).width<=maxWidth)return text;let t=text;while(t.length>2&&ctx.measureText(t+'…').width>maxWidth)t=t.slice(0,-1);return t+'…'}
+function drawText(ctx,text,x,y,size=26,weight='400',color='#111',align='left'){
+  ctx.font=`${weight} ${size}px -apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif`;ctx.fillStyle=color;ctx.textAlign=align;ctx.textBaseline='alphabetic';ctx.fillText(String(text??''),x,y)
+}
+function captureRecord(){
+  const db=loadDB();
+  // Prefer the record whose result is currently displayed; fall back to latest.
+  const home=(document.getElementById('home')?.value||'').trim(),away=(document.getElementById('away')?.value||'').trim();
+  return db.find(r=>r.home===home&&r.away===away)||db[0]||null;
+}
+async function buildResultCanvas(r){
+  if(!r)throw new Error('No record');
+
+  // 1080px keeps the full audit table readable while remaining safe on iPhone.
+  const W=1080, pad=34, content=W-pad*2;
+  const rows=(r.rows||[]).slice();
+
+  // Dynamic layout. Previous capture underestimated the real vertical space
+  // and could cut the last markets/footer.
+  const brandH=92, matchH=92, summaryH=154, confH=54;
+  const diagRowH=50, diagRows=9, diagH=88+diagRows*diagRowH;
+  const auditH=r.realResult?174:0;
+  const noteH=112, tableHeaderH=56, tableRowH=52;
+  const footerH=74;
+  const gaps=24+22+28+24+26+28+(r.realResult?24:0); // spacing between major blocks
+  const H=36+brandH+matchH+summaryH+confH+auditH+diagH+noteH+tableHeaderH+(rows.length*tableRowH)+footerH+gaps;
+
+  const canvas=document.createElement('canvas');
+  canvas.width=W; canvas.height=H;
+  const ctx=canvas.getContext('2d');
+  if(!ctx)throw new Error('Canvas 2D no disponible');
+
+  ctx.fillStyle='#f6f7f8'; ctx.fillRect(0,0,W,H);
+  let y=36;
+
+  // ---------- Brand ----------
+  roundRect(ctx,pad,y,content,brandH,24,'#0b0b0c');
+  drawText(ctx,'🎯',pad+24,y+58,40,'700','#fff');
+  drawText(ctx,'SOYJORDAN PICKS',pad+84,y+40,29,'800','#fff');
+  drawText(ctx,'ANÁLISIS DE VALOR',pad+84,y+67,15,'700','#b9bcc1');
+  drawText(ctx,'V1.6.2.5',W-pad-24,y+55,21,'700','#fff','right');
+  y+=brandH+24;
+
+  // ---------- Match ----------
+  drawText(ctx,`${r.home}  vs  ${r.away}`,pad,y+34,37,'800','#0b0b0c');
+  drawText(ctx,`${r.date||''}${r.league?' · '+r.league:''}${r.season?' · '+r.season:''}`,pad,y+66,18,'500','#666');
+  y+=matchH;
+
+  // ---------- Team summary ----------
+  const gap=18,bw=(content-gap)/2;
+  roundRect(ctx,pad,y,bw,summaryH,20,'#fff','#c7c9cc');
+  roundRect(ctx,pad+bw+gap,y,bw,summaryH,20,'#fff','#c7c9cc');
+
+  const homeAbsAtt=Number(r.absenceImpact?.home?.att ?? 0);
+  const homeAbsDef=Number(r.absenceImpact?.home?.def ?? 0);
+  const awayAbsAtt=Number(r.absenceImpact?.away?.att ?? 0);
+  const awayAbsDef=Number(r.absenceImpact?.away?.def ?? 0);
+
+  drawText(ctx,r.home,pad+22,y+37,25,'800');
+  drawText(ctx,`λ goles: ${Number(r.hl||0).toFixed(2)}`,pad+22,y+73,24,'700');
+  drawText(ctx,`Ausencia ataque: ${homeAbsAtt.toFixed(0)}/100`,pad+22,y+105,18,'500');
+  drawText(ctx,`Ausencia defensa: ${homeAbsDef.toFixed(0)}/100`,pad+22,y+132,18,'500');
+
+  const x2=pad+bw+gap+22;
+  drawText(ctx,r.away,x2,y+37,25,'800');
+  drawText(ctx,`λ goles: ${Number(r.al||0).toFixed(2)}`,x2,y+73,24,'700');
+  drawText(ctx,`Ausencia ataque: ${awayAbsAtt.toFixed(0)}/100`,x2,y+105,18,'500');
+  drawText(ctx,`Ausencia defensa: ${awayAbsDef.toFixed(0)}/100`,x2,y+132,18,'500');
+  y+=summaryH+22;
+
+  // ---------- Data confidence ----------
+  drawText(ctx,`Confianza de datos: ${Number(r.dataConfidence||0).toFixed(0)}/95`,pad,y+29,24,'700');
+  y+=confH;
+
+  // ---------- Post-match audit (only after a real result is registered) ----------
+  if(r.realResult){
+    const rr=r.realResult, top=(r.rows||[])[0], topOutcome=top?evaluateMarketOutcome(top,r,rr.homeGoals,rr.awayGoals):null;
+    roundRect(ctx,pad,y,content,auditH,18,'#fff','#111');
+    drawText(ctx,'✅ Auditoría postpartido',pad+20,y+36,25,'800');
+    drawText(ctx,`${r.home}  ${rr.homeGoals} - ${rr.awayGoals}  ${r.away}`,pad+20,y+73,27,'800','#111');
+    const resultLabel=topOutcome?auditOutcomeLabel(topOutcome):'—';
+    drawText(ctx,`Mejor pick prepartido: ${top?marketLabel(top.market):'—'}  ·  ${resultLabel}`,pad+20,y+105,17,'700',topOutcome==='win'?'#166534':topOutcome==='loss'?'#a82424':'#555');
+    const maeH=Math.abs(Number(rr.homeGoals)-Number(r.hl||0)),maeA=Math.abs(Number(rr.awayGoals)-Number(r.al||0));
+    drawText(ctx,`λ previsto ${Number(r.hl||0).toFixed(2)} - ${Number(r.al||0).toFixed(2)}  ·  Error abs. λ ${maeH.toFixed(2)} / ${maeA.toFixed(2)}`,pad+20,y+134,16,'600','#444');
+    const rxg=(Number.isFinite(Number(rr.homeXg))&&Number.isFinite(Number(rr.awayXg)))?`xG real ${Number(rr.homeXg).toFixed(2)} - ${Number(rr.awayXg).toFixed(2)}`:'xG real: no registrado';
+    drawText(ctx,rxg,pad+20,y+160,15,'500','#666');
+    y+=auditH+24;
+  }
+
+  // ---------- Full λ diagnostic ----------
+  const d=r.diagnostics||{};
+  roundRect(ctx,pad,y,content,diagH,20,'#fff','#9ea2a8');
+  drawText(ctx,'🔎 Diagnóstico del λ',pad+22,y+40,27,'800');
+
+  const labels=[
+    'Ataque bruto',
+    'Ataque ajustado',
+    'Debilidad defensiva bruta',
+    'Debilidad defensiva ajustada',
+    'Base λ antes de ausencias/descanso',
+    'Ajuste ataque por ausencias',
+    'Ajuste defensa rival por ausencias',
+    'Ajuste descanso',
+    'λ final'
+  ];
+
+  // Exact keys used by the V1.6 motor.
+  const vals=[
+    [d.Hatt?.raw,d.Aatt?.raw,2],
+    [d.Hatt?.shrunk,d.Aatt?.shrunk,2],
+    [d.Hdef?.raw,d.Adef?.raw,2],
+    [d.Hdef?.shrunk,d.Adef?.shrunk,2],
+    [d.baseH,d.baseA,2],
+    [d.absenceHAtt,d.absenceAAtt,3],
+    [d.absenceADef,d.absenceHDef,3],
+    [d.restHF,d.restAF,3],
+    [r.hl,r.al,2]
+  ];
+
+  let ry=y+72;
+  drawText(ctx,'Componente',pad+22,ry,17,'800');
+  drawText(ctx,'Local',W-pad-150,ry,17,'800','right');
+  drawText(ctx,'Visitante',W-pad-24,ry,17,'800','right');
+
+  for(let i=0;i<labels.length;i++){
+    const yy=ry+14+i*diagRowH;
+    ctx.strokeStyle='#d8dade';
+    ctx.beginPath();ctx.moveTo(pad+18,yy);ctx.lineTo(W-pad-18,yy);ctx.stroke();
+
+    const bold=i===8?'800':'500';
+    drawText(ctx,labels[i],pad+22,yy+31,17,bold);
+
+    const hv=vals[i][0], av=vals[i][1], digits=vals[i][2];
+    const hf=Number.isFinite(Number(hv))?Number(hv).toFixed(digits):'—';
+    const af=Number.isFinite(Number(av))?Number(av).toFixed(digits):'—';
+    drawText(ctx,hf,W-pad-150,yy+31,17,i===8?'800':'600','right');
+    drawText(ctx,af,W-pad-24,yy+31,17,i===8?'800':'600','right');
+  }
+  y+=diagH+28;
+
+  // ---------- Audit legend ----------
+  roundRect(ctx,pad,y,content,noteH,16,'#fff','#d2d5d9');
+  drawText(ctx,'Conf. = confianza del modelo · Robustez = estabilidad ante variaciones de λ',pad+20,y+33,17,'700');
+  drawText(ctx,'EV peor = peor EV en los escenarios de sensibilidad del modelo.',pad+20,y+63,17,'500','#333');
+  drawText(ctx,'Edge = diferencia entre probabilidad estimada y probabilidad implícita de la cuota.',pad+20,y+91,16,'500','#555');
+  y+=noteH+26;
+
+  // ---------- Complete market table ----------
+  // 11 columns: Pick, Prob., Justa, Cuota, Edge, EV, Value, Conf., Rob., EV peor, Decisión
+  const widths=[230,82,82,82,82,82,76,72,72,92,106];
+  const xs=[0];
+  for(const w of widths) xs.push(xs[xs.length-1]+w);
+  const scale=content/xs[xs.length-1];
+  const px=xs.map(v=>v*scale);
+
+  const heads=['Pick','Prob.','Justa','Cuota','Edge','EV','Value','Conf.','Rob.','EV peor','Decisión'];
+  roundRect(ctx,pad,y,content,tableHeaderH,14,'#111');
+
+  for(let i=0;i<heads.length;i++){
+    const x=pad+px[i]+7;
+    drawText(ctx,heads[i],x,y+35,14,'800','#fff');
+  }
+  y+=tableHeaderH;
+
+  for(const row of rows){
+    const dec=row.dec||'';
+    const bg=dec==='VALUE BET'?'#166534':dec==='WATCH'?'#9a5a08':'#a82424';
+    ctx.fillStyle=bg;ctx.fillRect(pad,y,content,tableRowH);
+
+    const valsRow=[
+      marketLabel(row.market),
+      `${(Number(row.p||0)*100).toFixed(1)}%`,
+      Number(row.fair||0).toFixed(2),
+      Number(row.odds||0).toFixed(2),
+      `${(Number(row.ed||0)*100).toFixed(1)}%`,
+      `${(Number(row.e||0)*100).toFixed(1)}%`,
+      Number(row.vs||0).toFixed(0),
+      Number(row.conf||0).toFixed(0),
+      Number(row.robustness||0).toFixed(0),
+      `${(Number(row.worstEV||0)*100).toFixed(1)}%`,
+      dec
+    ];
+
+    for(let i=0;i<valsRow.length;i++){
+      const colW=px[i+1]-px[i];
+      const fontSize=i===0?14:(i===10?12:13);
+      ctx.font=`700 ${fontSize}px -apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif`;
+      const text=fitText(ctx,valsRow[i],Math.max(44,colW-12));
+      drawText(ctx,text,pad+px[i]+7,y+32,fontSize,'700','#fff');
+    }
+    y+=tableRowH;
+  }
+
+  // ---------- Footer ----------
+  y+=26;
+  drawText(ctx,'Motor matemático: V1.6 · Interfaz/captura: V1.6.2.5',W/2,y+18,15,'600','#555','center');
+  drawText(ctx,`Generado ${new Date().toLocaleString('es-CO')} · SoyJordan Picks`,W/2,y+44,15,'500','#777','center');
+
+  return canvas;
+}
+function canvasToDataUrlSafe(canvas){
+  // Safari/iOS is substantially more reliable with toDataURL than canvas.toBlob
+  // inside an installed PWA. No external library, fetch(), ObjectURL or CORS involved.
+  try{
+    const dataUrl=canvas.toDataURL('image/png');
+    if(!dataUrl||!dataUrl.startsWith('data:image/png'))throw new Error('Canvas no produjo una imagen PNG válida');
+    return dataUrl;
+  }catch(e){
+    throw new Error('Canvas→PNG: '+(e?.message||e));
+  }
+}
+async function downloadResultCapture(){
+  try{
+    const r=captureRecord();
+    if(!r)return alert('No hay un análisis guardado para capturar. Primero pulsa “Analizar y guardar”.');
+    const canvas=await buildResultCanvas(r);
+    const dataUrl=canvasToDataUrlSafe(canvas);
+    const safe=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9_-]+/g,'_');
+    showCapturePreview(dataUrl,`SoyJordan_${safe(r.home)}_vs_${safe(r.away)}_V1625.png`);
+  }catch(e){
+    console.error('CAPTURE_RESULT_ERROR',e);
+    alert('No se pudo generar la captura.\n\nDetalle técnico: '+(e?.message||e));
+  }
+}
+async function downloadHistoryCapture(id){
+  try{
+    const r=loadDB().find(x=>x.id===id);
+    if(!r)return alert('No se encontró el análisis guardado.');
+    const canvas=await buildResultCanvas(r);
+    const dataUrl=canvasToDataUrlSafe(canvas);
+    const safe=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9_-]+/g,'_');
+    showCapturePreview(dataUrl,`SoyJordan_${safe(r.home)}_vs_${safe(r.away)}_${safe(r.date||'')}_V1625.png`);
+  }catch(e){
+    console.error('CAPTURE_HISTORY_ERROR',e);
+    alert('No se pudo generar la captura.\n\nDetalle técnico: '+(e?.message||e));
+  }
+}
+
+
+// ==================== V1.6.2.5 · AUDITORÍA POSTPARTIDO ====================
+function auditOutcomeLabel(s){
+  return s==="win"?"GANADA":s==="loss"?"PERDIDA":s==="push"?"NULA / PUSH":"NO EVALUABLE";
+}
+function auditOutcomeClass(s){
+  return s==="win"?"audit-win":s==="loss"?"audit-loss":s==="push"?"audit-push":"audit-pending";
+}
+function parseAsianMarket(row){
+  const text=String(row?.market||"");
+  const m=text.match(/^AH\s*·\s*(Local|Visitante)\s*([+-]?\d+(?:\.\d+)?)$/i);
+  if(!m)return null;
+  return {side:/local/i.test(m[1])?"home":"away",line:Number(m[2])};
+}
+function evaluateMarketOutcome(row,r,hg,ag){
+  hg=Number(hg);ag=Number(ag);
+  if(!Number.isFinite(hg)||!Number.isFinite(ag))return null;
+  const k=String(row?.market||"");
+  if(row?.isAsian||k.startsWith("AH")){
+    const ah=parseAsianMarket(row);if(!ah)return null;
+    const margin=(ah.side==="home"?hg-ag:ag-hg)+ah.line;
+    return margin>0?"win":margin<0?"loss":"push";
+  }
+  const total=hg+ag;
+  switch(k){
+    case "home": return hg>ag?"win":"loss";
+    case "draw": return hg===ag?"win":"loss";
+    case "away": return ag>hg?"win":"loss";
+    case "homeDnb": return hg>ag?"win":hg===ag?"push":"loss";
+    case "awayDnb": return ag>hg?"win":hg===ag?"push":"loss";
+    case "over15": return total>1.5?"win":"loss";
+    case "under15": return total<1.5?"win":"loss";
+    case "over25": return total>2.5?"win":"loss";
+    case "under25": return total<2.5?"win":"loss";
+    case "over35": return total>3.5?"win":"loss";
+    case "under35": return total<3.5?"win":"loss";
+    case "bttsYes": return hg>0&&ag>0?"win":"loss";
+    case "bttsNo": return !(hg>0&&ag>0)?"win":"loss";
+    case "home05": return hg>0.5?"win":"loss";
+    case "home15": return hg>1.5?"win":"loss";
+    case "away05": return ag>0.5?"win":"loss";
+    case "away15": return ag>1.5?"win":"loss";
+    default:return null;
+  }
+}
+function auditMetrics(r){
+  const rr=r?.realResult;if(!rr)return null;
+  const hg=Number(rr.homeGoals),ag=Number(rr.awayGoals),top=r.rows?.[0];
+  const topOutcome=top?evaluateMarketOutcome(top,r,hg,ag):null;
+  return {
+    hg,ag,top,topOutcome,
+    lambdaHomeError:Math.abs(hg-Number(r.hl||0)),
+    lambdaAwayError:Math.abs(ag-Number(r.al||0)),
+    lambdaTotalError:Math.abs((hg+ag)-(Number(r.hl||0)+Number(r.al||0)))
+  };
+}
+function ensureAuditModal(){
+  let m=document.getElementById("auditResultModal");if(m)return m;
+  m=document.createElement("div");m.id="auditResultModal";m.className="modal hidden";
+  m.innerHTML=`<div class="modal-sheet" style="max-width:620px">
+    <div class="detail-head"><div><h2 style="margin:0">✅ Registrar resultado real</h2><div id="auditMatchLabel" class="small muted"></div></div><button type="button" class="secondary" onclick="closeAuditModal()">✕</button></div>
+    <div class="grid" style="margin-top:12px">
+      <label>Goles local<input id="auditHomeGoals" type="number" min="0" step="1" inputmode="numeric"></label>
+      <label>Goles visitante<input id="auditAwayGoals" type="number" min="0" step="1" inputmode="numeric"></label>
+      <label>xG real local <span class="muted">(opcional)</span><input id="auditHomeXg" type="number" min="0" step=".01" inputmode="decimal"></label>
+      <label>xG real visitante <span class="muted">(opcional)</span><input id="auditAwayXg" type="number" min="0" step=".01" inputmode="decimal"></label>
+      <label class="full">Nota postpartido <span class="muted">(opcional)</span><textarea id="auditNotes" rows="3" placeholder="Ej.: Atlético dominó 5-0 en ocasiones claras."></textarea></label>
+    </div>
+    <div class="note" style="margin-top:10px">El resultado real se guarda como <b>auditoría postpartido</b>. No modifica los λ, probabilidades, EV ni el análisis prepartido.</div>
+    <div class="actions" style="margin-top:10px"><button type="button" onclick="saveRealResult()">Guardar auditoría</button><button type="button" class="secondary" onclick="closeAuditModal()">Cancelar</button></div>
+  </div>`;
+  document.body.appendChild(m);return m;
+}
+let auditAnalysisId=null;
+function openAuditModal(id){
+  const r=loadDB().find(x=>x.id===id);if(!r)return;
+  auditAnalysisId=id;const m=ensureAuditModal(),rr=r.realResult||{};
+  document.getElementById("auditMatchLabel").textContent=`${r.home} vs ${r.away} · ${r.date||""}`;
+  document.getElementById("auditHomeGoals").value=rr.homeGoals??"";
+  document.getElementById("auditAwayGoals").value=rr.awayGoals??"";
+  document.getElementById("auditHomeXg").value=rr.homeXg??"";
+  document.getElementById("auditAwayXg").value=rr.awayXg??"";
+  document.getElementById("auditNotes").value=rr.notes||"";
+  m.classList.remove("hidden");m.style.display="flex";document.body.style.overflow="hidden";
+}
+function closeAuditModal(){
+  const m=document.getElementById("auditResultModal");if(m){m.classList.add("hidden");m.style.display="none"}document.body.style.overflow="";
+}
+function settlePendingBetsFromRealResult(r){
+  const rr=r.realResult,bets=loadBets();let changed=0;
+  bets.forEach(b=>{
+    if(b.analysisId!==r.id||b.status!=="pending")return;
+    const row=(r.rows||[]).find(x=>String(x.market)===String(b.market));
+    if(!row)return;
+    const outcome=evaluateMarketOutcome(row,r,rr.homeGoals,rr.awayGoals);
+    if(!outcome)return;
+    b.status=outcome;
+    b.pnl=outcome==="win"?Number(b.stake)*(Number(b.odds)-1):outcome==="loss"?-Number(b.stake):0;
+    b.settledAt=new Date().toISOString();b.settledFromAudit=true;changed++;
+  });
+  if(changed)saveBets(bets);
+  return changed;
+}
+function saveRealResult(){
+  const hg=Number(document.getElementById("auditHomeGoals").value),ag=Number(document.getElementById("auditAwayGoals").value);
+  if(!Number.isInteger(hg)||hg<0||!Number.isInteger(ag)||ag<0)return alert("Introduce un marcador válido con goles enteros.");
+  const hxRaw=document.getElementById("auditHomeXg").value,axRaw=document.getElementById("auditAwayXg").value;
+  const hx=hxRaw===""?null:Number(hxRaw),ax=axRaw===""?null:Number(axRaw);
+  if((hx!==null&&(!Number.isFinite(hx)||hx<0))||(ax!==null&&(!Number.isFinite(ax)||ax<0)))return alert("Los xG reales deben ser números válidos o quedar vacíos.");
+  const db=loadDB(),r=db.find(x=>x.id===auditAnalysisId);if(!r)return;
+  r.realResult={homeGoals:hg,awayGoals:ag,homeXg:hx,awayXg:ax,notes:document.getElementById("auditNotes").value.trim(),recordedAt:new Date().toISOString()};
+  r.auditVersion="1.6.2.5";
+  saveDB(db);closeAuditModal();
+
+  const pending=betsForAnalysis(r.id).filter(b=>b.status==="pending").length;
+  if(pending&&confirm(`Resultado guardado.\n\nHay ${pending} apuesta(s) pendiente(s) de este partido. ¿Quieres liquidarlas automáticamente según el marcador ${hg}-${ag}?`)){
+    const changed=settlePendingBetsFromRealResult(r);
+    if(changed)alert(`${changed} apuesta(s) liquidada(s) automáticamente.`);
+  }
+  renderHistory();openHistoryDetail(r.id);
+}
+function removeRealResult(id){
+  const db=loadDB(),r=db.find(x=>x.id===id);if(!r?.realResult)return;
+  if(!confirm("¿Eliminar la auditoría postpartido? El análisis prepartido y las apuestas registradas se conservarán."))return;
+  delete r.realResult;delete r.auditVersion;saveDB(db);renderHistory();openHistoryDetail(id);
+}
+function auditDetailHtml(r){
+  const a=auditMetrics(r);
+  if(!a)return `<div class="audit-card"><div class="detail-head"><div><h3 style="margin:0">✅ Auditoría postpartido</h3><div class="small muted">Todavía no se registró el marcador real.</div></div></div><div class="audit-actions"><button type="button" onclick="openAuditModal(${r.id})">Registrar resultado real</button></div></div>`;
+  const rr=r.realResult,topLabel=a.top?marketLabel(a.top.market):"—";
+  const xgLine=(rr.homeXg!=null&&rr.awayXg!=null)?`${Number(rr.homeXg).toFixed(2)} - ${Number(rr.awayXg).toFixed(2)}`:"No registrado";
+  return `<div class="audit-card">
+    <div class="detail-head"><div><h3 style="margin:0">✅ Auditoría postpartido</h3><div class="small muted">El pronóstico prepartido permanece bloqueado e intacto.</div></div><span class="audit-outcome ${auditOutcomeClass(a.topOutcome)}">${auditOutcomeLabel(a.topOutcome)}</span></div>
+    <div class="audit-score"><div class="audit-team">${r.home}</div><div class="audit-score-main">${a.hg} - ${a.ag}</div><div class="audit-team">${r.away}</div></div>
+    <div class="audit-grid">
+      <div class="audit-stat"><small>Mejor pick prepartido</small><b>${topLabel}</b></div>
+      <div class="audit-stat"><small>Resultado del mejor pick</small><b>${auditOutcomeLabel(a.topOutcome)}</b></div>
+      <div class="audit-stat"><small>λ previsto</small><b>${Number(r.hl).toFixed(2)} - ${Number(r.al).toFixed(2)}</b></div>
+      <div class="audit-stat"><small>Goles reales</small><b>${a.hg} - ${a.ag}</b></div>
+      <div class="audit-stat"><small>Error abs. λ local / visitante</small><b>${a.lambdaHomeError.toFixed(2)} / ${a.lambdaAwayError.toFixed(2)}</b></div>
+      <div class="audit-stat"><small>Error total de goles</small><b>${a.lambdaTotalError.toFixed(2)}</b></div>
+      <div class="audit-stat"><small>xG real</small><b>${xgLine}</b></div>
+      <div class="audit-stat"><small>Registrado</small><b>${new Date(rr.recordedAt).toLocaleString("es-CO")}</b></div>
+    </div>
+    ${rr.notes?`<div class="note" style="margin-top:9px">${rr.notes}</div>`:""}
+    <div class="audit-actions"><button type="button" onclick="openAuditModal(${r.id})">✏️ Editar resultado</button><button type="button" class="secondary" onclick="downloadHistoryCapture(${r.id})">📸 Captura con auditoría</button><button type="button" class="dangerBtn" onclick="removeRealResult(${r.id})">Eliminar auditoría</button></div>
+  </div>`;
+}
+function auditPortfolioSummary(db){
+  const audited=db.filter(r=>r.realResult),outcomes=audited.map(r=>auditMetrics(r)?.topOutcome).filter(Boolean);
+  const wins=outcomes.filter(x=>x==="win").length,loss=outcomes.filter(x=>x==="loss").length,push=outcomes.filter(x=>x==="push").length;
+  const decided=wins+loss,hit=decided?wins/decided*100:0;
+  const lambdaMae=audited.length?audited.reduce((s,r)=>{const a=auditMetrics(r);return s+(a.lambdaHomeError+a.lambdaAwayError)/2},0)/audited.length:0;
+  return {audited,wins,loss,push,hit,lambdaMae};
+}
+
+// Preserve current V1.6.2.4 history-detail behavior, then append audit.
+const _openHistoryDetailV1625=openHistoryDetail;
+openHistoryDetail=function(id){
+  _openHistoryDetailV1625(id);
+  const r=loadDB().find(x=>x.id===id),box=document.getElementById("historyDetail"),card=box?.querySelector(".card");
+  if(!r||!card)return;
+  const betting=[...card.querySelectorAll(".detail-section")].find(x=>x.querySelector("h3")?.textContent.includes("Apuestas reales"));
+  const holder=document.createElement("div");holder.innerHTML=auditDetailHtml(r);
+  if(betting)betting.before(holder.firstElementChild);else{
+    const actions=card.querySelector(".actions");if(actions)card.insertBefore(holder.firstElementChild,actions);else card.appendChild(holder.firstElementChild);
+  }
+};
+
+// Final history renderer with both betting performance and post-match model audit.
+renderHistory=function(){
+  const db=loadDB(),bets=loadBets(),audit=auditPortfolioSummary(db);
+  const settled=bets.filter(x=>x.status!=="pending"),wins=settled.filter(x=>x.status==="win").length,loss=settled.filter(x=>x.status==="loss").length,push=settled.filter(x=>x.status==="push").length;
+  const pnl=settled.reduce((s,x)=>s+(Number(x.pnl)||0),0),staked=settled.reduce((s,x)=>s+(Number(x.stake)||0),0),hit=(wins+loss)?wins/(wins+loss)*100:0;
+  document.getElementById("stats").innerHTML=
+    `<span class="metric">Análisis: ${db.length}</span><span class="metric">Auditados: ${audit.audited.length}</span><span class="metric">Top pick W/L/P: ${audit.wins}/${audit.loss}/${audit.push}</span><span class="metric">Acierto top pick: ${audit.hit.toFixed(1)}%</span><span class="metric">MAE λ: ${audit.lambdaMae.toFixed(2)}</span>`+
+    `<span class="metric">Apuestas: ${bets.length}</span><span class="metric">Ganadas: ${wins}</span><span class="metric">Perdidas: ${loss}</span><span class="metric">Nulas: ${push}</span><span class="metric">Acierto real: ${hit.toFixed(1)}%</span><span class="metric">P&L: ${money(pnl)}</span><span class="metric">ROI: ${staked?(pnl/staked*100).toFixed(1):"0.0"}%</span>`;
+  const cards=db.map(r=>{
+    const x=r.rows?.[0],rb=betsForAnalysis(r.id),pending=rb.filter(b=>b.status==="pending").length,a=auditMetrics(r);
+    const auditBadge=a?`<span class="status-chip ${a.topOutcome==="win"?"audit-win":a.topOutcome==="loss"?"audit-loss":"locked"}">✅ ${a.hg}-${a.ag} · ${auditOutcomeLabel(a.topOutcome)}</span>`:"";
+    const lockBadge=r.preMatchLocked?'<span class="status-chip locked">🔒 BLOQUEADO</span>':pending?'<span class="status-chip pending">PENDIENTE</span>':'';
+    return `<div class="history-card" onclick="openHistoryDetail(${r.id})">
+      <div class="history-card-top"><div><div class="history-date">${r.date||''} · ${r.league||''}</div><div class="history-match">${r.home} <span class="muted">vs</span> ${r.away}</div></div><div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end">${auditBadge}${lockBadge}</div></div>
+      ${x?`<div class="history-pick"><div><small>MEJOR PICK DEL MODELO</small><br><b>${marketLabel(x.market)}</b></div><div style="text-align:right"><small>Cuota · EV</small><br><b>${Number(x.odds).toFixed(2)} · ${(Number(x.e)*100).toFixed(1)}%</b></div></div>`:''}
+      <div class="history-card-actions"><button type="button" onclick="event.stopPropagation();openAuditModal(${r.id})">${r.realResult?'✏️ Resultado':'✅ Registrar resultado'}</button><button type="button" onclick="event.stopPropagation();openBetModal(${r.id})">+ Apuesta</button><button type="button" class="secondary" onclick="event.stopPropagation();downloadHistoryCapture(${r.id})">📸 Captura</button><button type="button" class="dangerBtn" onclick="event.stopPropagation();deleteRecord(${r.id})">🗑️</button></div>
+      ${rb.length?`<div class="small muted" style="margin-top:6px">${rb.length} apuesta(s) registrada(s) · ${pending} pendiente(s)</div>`:''}
+    </div>`;
+  }).join("");
+  document.getElementById("historyTable").innerHTML=`<div class="history-cards">${cards||'<p class="muted">Todavía no hay análisis guardados.</p>'}</div>`;
+  renderBank();
+};
+
+
+if("serviceWorker"in navigator&&location.protocol!=="file:")navigator.serviceWorker.register("sw.js?ver=1.6.2.5").catch(()=>{});
+</script>
+
+
+<div id="vp-test-tools" style="margin:12px 0;padding:12px;border:1px dashed #666;border-radius:12px;background:#fff;color:#000">
+  <div style="font-weight:700;margin-bottom:8px">🧪 Herramientas de prueba V1.6.2.5</div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <button type="button" id="vp-load-test">Cargar prueba V1.6.2.5</button>
+    <button type="button" id="vp-clear-test" class="secondary">Limpiar formulario</button>
+  </div>
+  <div id="vp-test-status" class="small muted" style="margin-top:7px"></div>
+</div>
+<script>
+(function(){
+const test={
+ meta:{date:"2026-08-15",league:"Liga de Prueba",season:"2026/27",leagueAvg:"1.50",dataSource:"Datos ficticios",home:"Atlético Aurora",away:"Deportivo Central",notes:"PRUEBA V1.6.2.5 — datos ficticios."},
+ home:{last10:{gf:15,ga:9,xg:16.4,xga:10.2,shots:138,sot:49,sa:102,sota:32,bc:27,bca:18},last5:{gf:8,ga:5,xg:8.7,xga:5.8,shots:72,sot:27,sa:51,sota:16,bc:15,bca:9},condition5:{gf:9,ga:4,xg:9.1,xga:5.2,shots:75,sot:29,sa:48,sota:15,bc:16,bca:8},restCurrent:7},
+ away:{last10:{gf:12,ga:14,xg:13.1,xga:15.3,shots:121,sot:41,sa:133,sota:45,bc:22,bca:28},last5:{gf:7,ga:8,xg:7.2,xga:8.4,shots:63,sot:21,sa:69,sota:24,bc:12,bca:15},condition5:{gf:5,ga:9,xg:6.4,xga:9.0,shots:58,sot:19,sa:72,sota:26,bc:10,bca:17},restCurrent:6},
+ odds:{home:2.20,draw:3.20,away:3.40,over15:1.30,under15:3.40,over25:1.85,under25:1.90,over35:3.10,under35:1.35,bttsYes:1.80,bttsNo:1.95,homeDnb:1.65,awayDnb:2.10,home05:1.25,home15:2.05,away05:1.35,away15:2.70}
+};
+function setV(el,v){if(!el)return;el.value=v;el.dispatchEvent(new Event("input",{bubbles:true}));el.dispatchEvent(new Event("change",{bubbles:true}))}
+function loadTest(){
+ for(const [k,v] of Object.entries(test.meta))setV(document.getElementById(k),v);
+ for(const side of ["home","away"]){
+  for(const p of periods)for(const [k] of metrics)setV(document.querySelector(`[data-team="${side}"][data-period="${p[0]}"][data-key="${k}"]`),test[side][p[0]][k]);
+  setV(document.querySelector(`[data-team="${side}"][data-key="restCurrent"]`),test[side].restCurrent);
+ }
+ for(const [k,v] of Object.entries(test.odds))setV(document.querySelector(`[data-odd="${k}"]`),v);
+ setV(document.getElementById("homeAhLine"),"1");syncAhLine();setV(document.getElementById("homeAhOdds"),"1.45");setV(document.getElementById("awayAhOdds"),"2.80");
+ document.getElementById("vp-test-status").textContent="✅ Prueba V1.6 cargada.";
+}
+document.getElementById("vp-load-test").addEventListener("click",loadTest);
+document.getElementById("vp-clear-test").addEventListener("click",()=>{clearCurrentForm();document.getElementById("vp-test-status").textContent="Formulario limpio.";});
+})();
+</script>
+</body>
+</html>
