@@ -1,7 +1,7 @@
 {
   "name": "SoyJordan Picks V1.7.9",
   "short_name": "SoyJordan Picks",
-  "start_url": "./",
+  "start_url": "./?build=1804",
   "display": "standalone",
   "background_color": "#050505",
   "theme_color": "#050505",
