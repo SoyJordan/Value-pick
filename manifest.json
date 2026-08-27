@@ -1,0 +1,22 @@
+{
+  "name": "SoyJordan Picks V1.7.9",
+  "short_name": "SoyJordan Picks",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#050505",
+  "icons": [
+    {
+      "src": "sj-shield-192-v1798.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "sj-shield-512-v1798.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
