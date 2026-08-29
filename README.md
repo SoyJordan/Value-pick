@@ -25,3 +25,11 @@
 - Corrige auto-liquidación para usar cuota de casa cuando todas las patas ganan.
 - Combinadas con PUSH quedan pendientes de cuota efectiva real.
 - Marcadores internos y caché actualizados a build 1794.
+
+
+## V1.8.0 build 1800
+- Proyecto separado en `index.html`, `css/styles.css` y `js/app.js`.
+- Stake automático con 1/4 Kelly conservador basado en EV peor, confianza, robustez y penalización de cuota alta.
+- Combinadas desde Historial y soporte FreeBet.
+- Cinco filtros de apuestas.
+- Calibración avanzada de bajas y tope anti-doble-penalización sobre λ.

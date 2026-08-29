@@ -1,5 +1,5 @@
-const CACHE='soyjordan-v1795';
-const FILES=['./manifest.json','./logo.svg','./icon-192.png','./icon-512.png'];
+const CACHE='soyjordan-v1800';
+const FILES=['./index.html','./css/styles.css','./js/app.js','./manifest.json','./logo.svg','./icon-192.png','./icon-512.png'];
 
 self.addEventListener('install',event=>{
   event.waitUntil(
