@@ -27,9 +27,15 @@
 - Marcadores internos y caché actualizados a build 1794.
 
 
-## V1.8.0 build 1800
+## V1.8.0 build 1801
 - Proyecto separado en `index.html`, `css/styles.css` y `js/app.js`.
 - Stake automático con 1/4 Kelly conservador basado en EV peor, confianza, robustez y penalización de cuota alta.
 - Combinadas desde Historial y soporte FreeBet.
 - Cinco filtros de apuestas.
 - Calibración avanzada de bajas y tope anti-doble-penalización sobre λ.
+
+
+### Hotfix build 1801
+- Stake recomendado renderizado directamente en tablas y Top Pick General.
+- Top General armonizado con los requisitos reforzados de divergencia: >35% puede pasar solo con Conf≥85, Rob≥85 y EV peor≥8%.
+- Cache bust para Safari/GitHub Pages y Service Worker v1801.
