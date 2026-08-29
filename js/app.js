@@ -561,7 +561,7 @@ ${r.matchMode==="cup"?`<tr><td>Índice interliga (70/30)</td><td>${(d.interIndex
 <tr><td><b>λ final</b></td><td><b>${r.hl.toFixed(2)}</b></td><td><b>${r.al.toFixed(2)}</b></td></tr>
 </table></div>
 <p class="small muted">El motor λ V1.7.1 usa 70% xG/xGA y 30% GF/GA dentro de cada ventana disponible, pondera Últimos 10/Últimos 5/condición en 50%/30%/20%, redistribuye pesos si faltan datos y aplica regresión. En Liga conserva la ruta V1.6.4. En Copas añade, después de la regularización 55%, un ajuste interliga moderado (70% fuerza de liga + 30% nivel del equipo; máximo ±12%) y, solo en vueltas, un ajuste de urgencia por el marcador global (+4% / +8% al ataque del equipo que necesita 1 / 2+ goles).</p>
-<div class="note" style="margin-top:10px"><b>Selector V1.8.0 build 1801:</b> separa GANADORES, GOLES, HÁNDICAP y AMBOS MARCAN. Primero aplica la puerta de elegibilidad y después usa el Selector Score: <b>30% Robustez + 25% EV peor + 20% Confianza + 15% Value + 10% Probabilidad</b>. Cuotas <b>&lt;1.35 se ignoran</b>. Las divergencias con mercado endurecen requisitos; por encima de 35% un candidato solo puede llegar a Top General si supera <b>Conf≥85, Rob≥85 y EV peor≥8%</b>. Además, los picks direccionales que contradicen una diferencia clara de λ reciben penalización y, con brechas fuertes, requisitos extra. Para ser TOP GENERAL exige Score≥70, Confianza≥75, Robustez≥65 y EV peor positivo. Los mercados equivalentes 1X/H1X2 Local +1 y X2/H1X2 Visitante +1 compiten como un solo evento y se prioriza la mejor cuota. En Copa ida la confianza de selección recibe -5 sin modificar λ. Si una categoría no tiene VALUE BET, igualmente muestra su mejor candidato relativo como WATCH o NO BET.</div>${pushMarketAuditHTML(r.rows)}`;
+<div class="note" style="margin-top:10px"><b>Selector V1.8.0 build 1803:</b> separa GANADORES, GOLES, HÁNDICAP y AMBOS MARCAN. Primero aplica la puerta de elegibilidad y después usa el Selector Score: <b>30% Robustez + 25% EV peor + 20% Confianza + 15% Value + 10% Probabilidad</b>. Cuotas <b>&lt;1.35 se ignoran</b>. Las divergencias con mercado endurecen requisitos; por encima de 35% un candidato solo puede llegar a Top General si supera <b>Conf≥85, Rob≥85 y EV peor≥8%</b>. Además, los picks direccionales que contradicen una diferencia clara de λ reciben penalización y, con brechas fuertes, requisitos extra. Para ser TOP GENERAL exige Score≥70, Confianza≥75, Robustez≥65 y EV peor positivo. Los mercados equivalentes 1X/H1X2 Local +1 y X2/H1X2 Visitante +1 compiten como un solo evento y se prioriza la mejor cuota. En Copa ida la confianza de selección recibe -5 sin modificar λ. Si una categoría no tiene VALUE BET, igualmente muestra su mejor candidato relativo como WATCH o NO BET.</div>${pushMarketAuditHTML(r.rows)}`;
 const general=(r.rows||[]).find(x=>x.topGeneral);
 if(general)h+=`<div class="card" style="margin-top:12px;border:2px solid #166534;background:#f4fbf6"><h3 style="margin:0 0 6px">⭐ TOP PICK GENERAL</h3><div style="font-size:20px;font-weight:800">${marketLabel(general.market)}</div><div class="small" style="margin-top:5px">${categoryLabel(general.category)} · Score ${Number(general.rankScore||0).toFixed(0)} · Prob. ${(Number(general.p||0)*100).toFixed(1)}% · EV ${(Number(general.e||0)*100).toFixed(1)}% · EV peor ${(Number(general.worstEV||0)*100).toFixed(1)}%</div><div style="margin-top:7px;font-weight:800;color:#166534">VALUE BET</div><div class="stake-reco"><b>Stake recomendado:</b> ${stakeLabel(general,true)}<br><span>¼ Kelly conservador sobre EV peor · ajustado por Confianza, Robustez y cuota. 1u = 1% del bank.</span></div></div>`;
 else h+=`<div class="card" style="margin-top:12px;border:2px solid #9a6700;background:#fff8e6"><h3 style="margin:0 0 6px">⭐ TOP PICK GENERAL</h3><div style="font-size:22px;font-weight:900">NO BET</div><div class="small" style="margin-top:5px">Ningún VALUE BET elegible alcanza los mínimos del Top General: Score ≥70 · Confianza ≥75 · Robustez ≥65 · EV peor positivo.</div></div>`;
@@ -1151,7 +1151,7 @@ async function buildResultCanvas(r){
   const diagRowH=50, diagRows=10, diagH=88+diagRows*diagRowH;
   const auditH=r.realResult?174:0;
   const noteH=126, tableHeaderH=56, tableRowH=60;
-  const topGeneralH=108, catTitleH=48, catTopH=52;
+  const topGeneralH=138, catTitleH=48, catTopH=52;
   const captureCats=["GANADORES","GOLES","HANDICAP","AMBOS MARCAN"];
   const captureGroups=captureCats.map(cat=>({cat,rows:rows.filter(x=>(x.category||marketCategory(x))===cat)})).filter(g=>g.rows.length);
   const generalPick=rows.find(x=>x.topGeneral);
@@ -1292,6 +1292,8 @@ async function buildResultCanvas(r){
     drawText(ctx,'⭐ TOP PICK GENERAL',pad+20,y+32,23,'800','#166534');
     drawText(ctx,marketLabel(generalPick.market),pad+20,y+63,25,'800','#111');
     drawText(ctx,`${categoryLabel(generalPick.category)} · Score ${Number(generalPick.rankScore||0).toFixed(0)} · Prob. ${(Number(generalPick.p||0)*100).toFixed(1)}% · EV ${(Number(generalPick.e||0)*100).toFixed(1)}% · EV peor ${(Number(generalPick.worstEV||0)*100).toFixed(1)}%`,pad+20,y+91,15,'600','#444');
+    const gs=recommendedStake(generalPick,true);
+    drawText(ctx,`Stake recomendado: ${gs.units.toFixed(2)}u${gs.amount>0?` · ${money(gs.amount)}`:''}`,pad+20,y+120,16,'800','#166534');
   }else{
     roundRect(ctx,pad,y,content,topGeneralH,18,'#fff8e6','#9a6700');
     drawText(ctx,'⭐ TOP PICK GENERAL',pad+20,y+32,23,'800','#9a6700');
@@ -1301,13 +1303,14 @@ async function buildResultCanvas(r){
   y+=topGeneralH+20;
 
   // ---------- Markets grouped by category ----------
-  // 11 columns: Pick, Prob., Justa, Cuota, Edge, EV, Value, Conf., Rob., EV peor, Decisión
-  const widths=[230,82,82,82,82,82,76,72,72,92,106];
+  // Captura compacta: Score ya aparece en el encabezado de categoría; priorizamos mostrar Stake.
+  // 12 columnas: Pick, Prob., Justa, Cuota, Edge, EV, Value, Conf., Rob., EV peor, Stake, Decisión
+  const widths=[220,74,72,72,72,72,64,62,62,82,82,92];
   const xs=[0];
   for(const w of widths) xs.push(xs[xs.length-1]+w);
   const scale=content/xs[xs.length-1];
   const px=xs.map(v=>v*scale);
-  const heads=['Pick','Prob.','Justa','Cuota','Edge','EV','Value','Conf.','Rob.','EV peor','Decisión'];
+  const heads=['Pick','Prob.','Justa','Cuota','Edge','EV','Value','Conf.','Rob.','EV peor','Stake','Decisión'];
 
   for(const group of captureGroups){
     drawText(ctx,categoryLabel(group.cat),pad,y+31,24,'800','#111');
@@ -1339,10 +1342,11 @@ async function buildResultCanvas(r){
         Number(row.conf||0).toFixed(0),
         Number(row.robustness||0).toFixed(0),
         `${(Number(row.worstEV||0)*100).toFixed(1)}%`,
+        `${recommendedStake(row,!!row.topGeneral).units.toFixed(2)}u`,
         dec
       ];
       for(let i=0;i<valsRow.length;i++){
-        const colW=px[i+1]-px[i],fontSize=i===0?14:(i===10?12:13);
+        const colW=px[i+1]-px[i],fontSize=i===0?14:(i===11?11:12);
         ctx.font=`700 ${fontSize}px -apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif`;
         const text=fitText(ctx,valsRow[i],Math.max(44,colW-12));
         drawText(ctx,text,pad+px[i]+7,y+(i===0&&row.isDnb?25:36),fontSize,'700','#fff');
@@ -1684,13 +1688,13 @@ function migrateLegacyAsianRowsToEuropean(){
 }
 migrateLegacyAsianRowsToEuropean();
 
-if("serviceWorker"in navigator&&location.protocol!=="file:")navigator.serviceWorker.register("sw.js?ver=1.8.0-build1800").catch(()=>{});
+if("serviceWorker"in navigator&&location.protocol!=="file:")navigator.serviceWorker.register("sw.js?ver=1.8.0-build1803").catch(()=>{});
 
 
 
 (function(){
 const test={
- meta:{date:"2026-08-15",league:"Liga de Prueba",season:"2026/27",leagueAvg:"1.50",dataSource:"Datos ficticios",home:"Atlético Aurora",away:"Deportivo Central",notes:"PRUEBA V1.8.0 build 1801 — datos ficticios."},
+ meta:{date:"2026-08-15",league:"Liga de Prueba",season:"2026/27",leagueAvg:"1.50",dataSource:"Datos ficticios",home:"Atlético Aurora",away:"Deportivo Central",notes:"PRUEBA V1.8.0 build 1803 — datos ficticios."},
  home:{last10:{gf:15,ga:9,xg:16.4,xga:10.2,shots:138,sot:49,sa:102,sota:32,bc:27,bca:18},last5:{gf:8,ga:5,xg:8.7,xga:5.8,shots:72,sot:27,sa:51,sota:16,bc:15,bca:9},condition5:{gf:9,ga:4,xg:9.1,xga:5.2,shots:75,sot:29,sa:48,sota:15,bc:16,bca:8},restCurrent:7},
  away:{last10:{gf:12,ga:14,xg:13.1,xga:15.3,shots:121,sot:41,sa:133,sota:45,bc:22,bca:28},last5:{gf:7,ga:8,xg:7.2,xga:8.4,shots:63,sot:21,sa:69,sota:24,bc:12,bca:15},condition5:{gf:5,ga:9,xg:6.4,xga:9.0,shots:58,sot:19,sa:72,sota:26,bc:10,bca:17},restCurrent:6},
  odds:{home:2.20,draw:3.20,away:3.40,homeDnb:1.65,awayDnb:2.10,homeOrDraw:1.30,awayOrDraw:1.62,over15:1.30,under15:3.40,over25:1.85,under25:1.90,over35:3.10,under35:1.35,home05:1.25,home15:2.05,away05:1.35,away15:2.70,bttsYes:1.80,bttsNo:1.95}
@@ -1704,7 +1708,7 @@ function loadTest(){
  }
  for(const [k,v] of Object.entries(test.odds))setV(document.querySelector(`[data-odd="${k}"]`),v);
  setV(document.querySelector(`[data-eh-line="1"][data-eh-outcome="home"]`),"1.88");setV(document.querySelector(`[data-eh-line="1"][data-eh-outcome="draw"]`),"4.40");setV(document.querySelector(`[data-eh-line="1"][data-eh-outcome="away"]`),"7.25");setV(document.querySelector(`[data-eh-line="-1"][data-eh-outcome="home"]`),"3.10");setV(document.querySelector(`[data-eh-line="-1"][data-eh-outcome="draw"]`),"3.60");setV(document.querySelector(`[data-eh-line="-1"][data-eh-outcome="away"]`),"1.75");
- document.getElementById("vp-test-status").textContent="✅ Prueba V1.8.0 build 1801 cargada (stake visible + Top General corregido).";
+ document.getElementById("vp-test-status").textContent="✅ Prueba V1.8.0 build 1803 cargada (stake visible también en captura + Top General corregido).";
 }
 document.getElementById("vp-load-test").addEventListener("click",loadTest);
 document.getElementById("vp-clear-test").addEventListener("click",()=>{clearCurrentForm();document.getElementById("vp-test-status").textContent="Formulario limpio.";});
