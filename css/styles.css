@@ -88,3 +88,11 @@ table{width:100%;border-collapse:collapse;font-size:12px;color:#000}td,th{paddin
 
 /* V1.8.0 */
 .bet-filter-bar{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}.bet-filter.active{background:#000;color:#fff}.filter-hidden{display:none!important}.stake-reco{margin-top:10px;padding:9px;border-radius:10px;background:#ecfdf5;border:1px solid #166534;color:#052e16;font-size:12px}.stake-reco span{opacity:.75}.stake-col{white-space:nowrap}.absence-cal-card{box-shadow:none;background:#fff}.absence-cal-card h3{margin:0 0 8px}.absence-summary{margin-top:8px;padding:8px;border-radius:9px;background:#f2f2f2;font-size:12px}.absence-summary span{opacity:.65}.freebet-chip{display:inline-block;background:#111;color:#fff;padding:4px 7px;border-radius:999px;font-size:10px;font-weight:900;margin-bottom:6px}
+
+
+/* Build 1808 · combinadas integradas en Historial */
+.combo-summary-grid{margin-top:10px;}
+.combo-form-grid{margin-top:12px;}
+.combo-builder-actions{margin-top:12px;}
+#comboHistoryBuilder{border:1px solid var(--line,#d7dce2);}
+#historyCombosCard{margin-top:12px;}
