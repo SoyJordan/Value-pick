@@ -8,8 +8,8 @@
 <link href="manifest.json" rel="manifest"/>
 <title>SoyJordan Picks V1.8.0</title>
 
-<link href="css/styles.css?v=1807" rel="stylesheet"/></head>
-<body><div class="u-inline-1" id="buildMarker">build 1807</div>
+<link href="css/styles.css?v=1808" rel="stylesheet"/></head>
+<body><div class="u-inline-1" id="buildMarker">build 1808</div>
 <main class="app">
 <header class="brand-header">
 <img alt="SoyJordan Picks" class="brand-logo" src="logo.svg"/>
@@ -31,7 +31,6 @@
 <button data-v1800-event="v1800-static-3">Nuevo análisis</button>
 <button class="secondary" data-v1800-event="v1800-static-4">Historial</button>
 <button class="secondary" data-v1800-event="v1800-static-5">📊 Apuestas</button>
-<button class="secondary" data-v1800-event="v1800-static-6">Combinadas</button>
 <button class="secondary" data-v1800-event="v1800-static-7">Datos</button>
 </div>
 <section id="analysis">
@@ -86,8 +85,33 @@ Introduce solo el <b>impacto agregado 0–100</b> de las bajas confirmadas relev
 <div id="result"></div>
 </section>
 <section class="hidden" id="history">
-<div class="card" id="historyList"><h2>📚 Historial</h2><div id="stats"></div><p class="small muted">Toca un partido para ver todos los datos guardados y el resultado completo.</p><div id="historyTable"></div></div>
+<div class="card hidden" id="comboHistoryBuilder">
+<h2>🔗 Combinada en curso</h2>
+<p class="small muted">Añade selecciones con el botón <b>+ Combinada</b> de cada partido del historial. Todo el proceso se completa aquí, sin salir del historial.</p>
+<div id="comboBuilderLegs"></div>
+<div class="summary combo-summary-grid">
+<div class="box">Cuota teórica<br/><b id="comboCombinedOdds">1.00</b></div>
+<div class="box">Cuota casa<br/><b id="comboHouseOddsDisplay">—</b></div>
+<div class="box">Retorno potencial<br/><b id="comboPotentialReturn">$0</b></div>
+</div>
+<div class="compact-grid combo-form-grid">
+<label>Nombre de la combinada<input id="comboName" placeholder="Ej.: Premier tarde"/></label>
+<label>Cuota total de la casa<input data-v1800-event="v1800-static-14" id="comboHouseOdds" min="1" placeholder="Ej.: 2.25" step="0.01" type="number"/></label>
+<label>Monto apostado<input data-v1800-event="v1800-static-15" id="comboStake" min="0" placeholder="Ej.: 50000" step="1000" type="number"/></label>
+<label>Tipo de apuesta<select id="comboStakeType"><option value="cash">Dinero real</option><option value="freebet">Apuesta gratis / FreeBet</option></select></label>
+</div>
+<div class="actions combo-builder-actions">
+<button data-v1800-event="v1800-static-16" type="button">GUARDAR COMBINADA</button>
+<button class="secondary" data-v1800-event="v1800-static-13" type="button">Limpiar combinada</button>
+</div>
+</div>
+<div class="card" id="historyList"><h2>📚 Historial</h2><div id="stats"></div><p class="small muted">Toca un partido para ver todos los datos guardados y el resultado completo. Usa <b>+ Combinada</b> para ir agregando selecciones sin salir de esta pantalla.</p><div id="historyTable"></div></div>
 <div class="hidden" id="historyDetail"></div>
+<div class="card" id="historyCombosCard">
+<h2>🔗 Combinadas guardadas</h2>
+<div id="comboStats"></div>
+<div id="comboList"></div>
+</div>
 </section>
 <section class="hidden" id="betHistory">
 <div class="card">
@@ -102,38 +126,6 @@ Introduce solo el <b>impacto agregado 0–100</b> de las bajas confirmadas relev
 <button class="bet-filter secondary" data-bet-filter="push" type="button">Push / Nulas</button>
 </div>
 <div class="u-inline-3" id="betHistoryTable"></div>
-</div>
-</section>
-<section class="hidden" id="combos">
-<div class="card">
-<h2>🔗 Crear combinada</h2>
-<p class="small muted">Agrega picks ya analizados. La app muestra la cuota teórica, pero usa la cuota total real de la casa para el retorno y la liquidación.</p>
-<div class="compact-grid">
-<label>Partido<select data-v1800-event="v1800-static-11" id="comboAnalysisSelect"></select></label>
-<label>Pick<select id="comboPickSelect"></select><span class="small muted" id="comboPickCount"></span></label>
-</div>
-<div class="actions u-inline-6">
-<button data-v1800-event="v1800-static-12" type="button">+ Agregar selección</button>
-<button class="secondary" data-v1800-event="v1800-static-13" type="button">Limpiar combinada</button>
-</div>
-<div class="u-inline-3" id="comboBuilderLegs"></div>
-<div class="summary u-inline-3">
-<div class="box">Cuota teórica<br/><b id="comboCombinedOdds">1.00</b></div>
-<div class="box">Cuota casa<br/><b id="comboHouseOddsDisplay">—</b></div>
-<div class="box">Retorno potencial<br/><b id="comboPotentialReturn">$0</b></div>
-</div>
-<div class="compact-grid u-inline-6">
-<label>Nombre de la combinada<input id="comboName" placeholder="Ej.: MLS noche"/></label>
-<label>Cuota total de la casa<input data-v1800-event="v1800-static-14" id="comboHouseOdds" min="1" placeholder="Ej.: 2.25" step="0.01" type="number"/></label>
-<label>Monto apostado<input data-v1800-event="v1800-static-15" id="comboStake" min="0" placeholder="Ej.: 50000" step="1000" type="number"/></label>
-<label>Tipo de apuesta<select id="comboStakeType"><option value="cash">Dinero real</option><option value="freebet">Apuesta gratis / FreeBet</option></select></label>
-</div>
-<button class="u-inline-7" data-v1800-event="v1800-static-16" type="button">GUARDAR COMBINADA</button>
-</div>
-<div class="card">
-<h2>📚 Combinadas guardadas</h2>
-<div id="comboStats"></div>
-<div id="comboList"></div>
 </div>
 </section>
 <section class="hidden" id="backup">
@@ -177,5 +169,5 @@ Introduce solo el <b>impacto agregado 0–100</b> de las bajas confirmadas relev
 <div class="small muted u-inline-13" id="vp-test-status"></div>
 </div>
 
-<script defer="defer" src="js/app-1807.js?v=1807"></script></body>
+<script defer="defer" src="js/app-1808.js?v=1808"></script></body>
 </html>

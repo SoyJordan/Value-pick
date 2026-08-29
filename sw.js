@@ -1,5 +1,5 @@
-const CACHE='soyjordan-v1807';
-const FILES=['./index.html','./css/styles.css?v=1807','./js/app-1807.js?v=1807','./manifest.json','./logo.svg','./icon-192.png','./icon-512.png'];
+const CACHE='soyjordan-v1808';
+const FILES=['./index.html','./css/styles.css?v=1808','./js/app-1808.js?v=1808','./manifest.json','./logo.svg','./icon-192.png','./icon-512.png'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(FILES)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
 self.addEventListener('fetch',event=>{
