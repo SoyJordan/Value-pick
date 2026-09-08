@@ -6,14 +6,14 @@
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
 <meta content="#000000" name="theme-color"/>
 <link href="manifest.json" rel="manifest"/>
-<title>SoyJordan Picks V1.8.0</title>
+<title>SoyJordan Picks V2.0</title>
 
-<link href="css/styles.css?v=1810" rel="stylesheet"/></head>
-<body><div class="u-inline-1" id="buildMarker">build 1810</div>
+<link href="css/styles.css?v=2000" rel="stylesheet"/></head>
+<body><div class="u-inline-1" id="buildMarker">build 2000</div>
 <main class="app">
 <header class="brand-header">
 <img alt="SoyJordan Picks" class="brand-logo" src="logo.svg"/>
-<div class="brand-copy"><div class="muted">V1.8.0 · Hándicap 1X2 europeo · NO BET protegido · Historial sincronizado</div></div>
+<div class="brand-copy"><div class="muted">V2.0 · Hándicap 1X2 europeo · NO BET protegido · Historial sincronizado</div></div>
 </header>
 <div class="bank-panel bank-compact" id="bankPanel">
 <div class="bank-strip">
@@ -30,7 +30,7 @@
 <div class="nav">
 <button data-v1800-event="v1800-static-3">Nuevo análisis</button>
 <button class="secondary" data-v1800-event="v1800-static-4">Historial</button>
-<button class="secondary" data-v1800-event="v1800-static-5">📊 Apuestas</button>
+<button class="secondary" data-v1800-event="v1800-static-5">📊 Apuestas</button><button class="secondary" id="openCalibration">📈 Calibración</button>
 <button class="secondary" data-v1800-event="v1800-static-7">Datos</button>
 </div>
 <section id="analysis">
@@ -77,7 +77,7 @@ Introduce solo el <b>impacto agregado 0–100</b> de las bajas confirmadas relev
 </div>
 <div class="card">
 <h2>💰 Cuotas</h2>
-<p class="small muted">Introduce solo las cuotas disponibles. <b>Cuotas menores a 1.35 se ignoran</b>; desde 1.35 en adelante todas se evalúan con los mismos criterios.</p>
+<p class="small muted">Introduce solo las cuotas disponibles. <b>Cuotas menores a 1.35 <b>no compiten como pick individual</b>, pero siguen disponibles para combinadas. Desde 1.35 se evalúan normalmente.</p>
 <div id="odds"></div>
 </div>
 <button class="u-inline-4" type="submit">ANALIZAR Y GUARDAR</button><button class="secondary u-inline-5" data-v1800-event="v1800-static-10" type="button">🧹 Limpiar datos</button>
@@ -128,10 +128,14 @@ Introduce solo el <b>impacto agregado 0–100</b> de las bajas confirmadas relev
 <div class="u-inline-3" id="betHistoryTable"></div>
 </div>
 </section>
+
+<section class="hidden" id="calibration">
+<div class="card"><h2>📈 Calibración V2</h2><p class="small muted">Rendimiento real por mercado, cuota, decisión y stake. Usa únicamente apuestas liquidadas; las FreeBet se separan del ROI de dinero propio.</p><div id="calibrationSummary"></div><div id="calibrationTables"></div></div>
+</section>
 <section class="hidden" id="backup">
 <div class="card">
 <h2>💾 Datos</h2>
-<p>El backup V1.8.0 incluye análisis, apuestas individuales, combinadas, bank inicial, historial de rendimiento y ajustes manuales.</p>
+<p>El backup V2.0 incluye análisis, apuestas individuales, combinadas, bank inicial, historial de rendimiento y ajustes manuales.</p>
 <div class="actions">
 <button data-v1800-event="v1800-static-17">Exportar backup</button>
 <label class="u-inline-8">
@@ -160,14 +164,21 @@ Introduce solo el <b>impacto agregado 0–100</b> de las bajas confirmadas relev
 </div>
 </main>
 
+<div id="comboFloat" class="combo-float hidden" aria-live="polite">
+  <div class="combo-float-head"><b>🔗 Combinada V2</b><button id="comboFloatClose" class="icon-btn secondary" type="button">−</button></div>
+  <div id="comboFloatLegs"></div>
+  <div class="combo-float-total">Cuota teórica <b id="comboFloatOdds">1.00</b></div>
+  <button id="comboFloatOpenHistory" type="button">Abrir constructor</button>
+</div>
+
 <div class="u-inline-10" id="vp-test-tools">
-<div class="u-inline-11">🧪 Herramientas de prueba V1.8.0</div>
+<div class="u-inline-11">🧪 Herramientas de prueba V2.0</div>
 <div class="u-inline-12">
-<button id="vp-load-test" type="button">Cargar prueba V1.8.0</button>
+<button id="vp-load-test" type="button">Cargar prueba V2.0</button>
 <button class="secondary" id="vp-clear-test" type="button">Limpiar formulario</button>
 </div>
 <div class="small muted u-inline-13" id="vp-test-status"></div>
 </div>
 
-<script defer="defer" src="js/app-1810.js?v=1810"></script></body>
+<script defer src="js/app-core.js?v=2000"></script><script defer src="js/v2-ui.js?v=2000"></script></body>
 </html>
