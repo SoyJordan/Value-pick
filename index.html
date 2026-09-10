@@ -6,14 +6,14 @@
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
 <meta content="#000000" name="theme-color"/>
 <link href="manifest.json" rel="manifest"/>
-<title>SoyJordan Picks V2.0</title>
+<title>SoyJordan Picks V2.5.0</title>
 
-<link href="css/styles.css?v=2000" rel="stylesheet"/></head>
-<body><div class="u-inline-1" id="buildMarker">build 2000</div>
+<link href="css/styles.css?v=2500" rel="stylesheet"/></head>
+<body><div class="u-inline-1" id="buildMarker">build 2500</div>
 <main class="app">
 <header class="brand-header">
 <img alt="SoyJordan Picks" class="brand-logo" src="logo.svg"/>
-<div class="brand-copy"><div class="muted">V2.0 · Hándicap 1X2 europeo · NO BET protegido · Historial sincronizado</div></div>
+<div class="brand-copy"><div class="muted">V2.5.0 · Fuerza estructural · Calibración probabilística · Riesgo profesional</div></div>
 </header>
 <div class="bank-panel bank-compact" id="bankPanel">
 <div class="bank-strip">
@@ -55,14 +55,14 @@
 <label>Formato<select data-v1800-event="v1800-static-9" id="cupLeg"><option value="single">Partido único</option><option value="first">Ida</option><option value="second">Vuelta</option></select></label>
 <label class="hidden" id="aggHomeWrap">Global previo LOCAL<input id="aggHome" min="0" step="1" type="number" value="0"/></label>
 <label class="hidden" id="aggAwayWrap">Global previo VISITANTE<input id="aggAway" min="0" step="1" type="number" value="0"/></label>
-</div><div class="note u-inline-3"><b>Índice interliga:</b> 70% fuerza de la liga + 30% nivel del equipo dentro de esa liga. La diferencia solo puede mover el λ hasta aproximadamente ±12%. En una vuelta, ir perdiendo el global aumenta de forma conservadora la expectativa ofensiva del equipo obligado a buscar goles: +4% si necesita 1 y +8% si necesita 2 o más.</div></div>
+</div><div class="note u-inline-3"><b>Índice interliga:</b> 70% fuerza de la liga + 30% nivel del equipo dentro de esa liga. La diferencia usa caps conservadores de V2.5 y queda registrada en la trazabilidad histórica. En una vuelta, ir perdiendo el global aumenta de forma conservadora la expectativa ofensiva del equipo obligado a buscar goles: +4% si necesita 1 y +8% si necesita 2 o más.</div></div>
 <label class="full">Fuente de datos<input id="dataSource" placeholder="Ej.: FotMob / Opta"/></label>
 <label>Local<input id="home" required=""/></label>
 <label>Visitante<input id="away" required=""/></label>
 <label class="full">Notas<textarea id="notes" placeholder="Contexto objetivo, fuentes, etc."></textarea></label>
 </div>
 <div class="note u-inline-3">
-<b>Motor base V1.7.1:</b> usa <b>Últimos 10 (50%) + Últimos 5 (20%) + Últimos 5 en condición (30%)</b>.
+<b>Motor V2.5:</b> usa <b>Últimos 10 (50%) + Últimos 5 (30%) + Últimos 5 en condición (20%)</b>.
 Los datos de GF, GA, xG, xGA, tiros y ocasiones se introducen como <b>totales acumulados</b>.
 La app los convierte a promedio por partido. Un campo vacío se ignora y su peso se redistribuye; no se interpreta como cero.
 </div>
@@ -135,7 +135,7 @@ Introduce solo el <b>impacto agregado 0–100</b> de las bajas confirmadas relev
 <section class="hidden" id="backup">
 <div class="card">
 <h2>💾 Datos</h2>
-<p>El backup V2.0 incluye análisis, apuestas individuales, combinadas, bank inicial, historial de rendimiento y ajustes manuales.</p>
+<p>El backup V2.5 incluye análisis, apuestas individuales, combinadas, bank inicial, historial de rendimiento y ajustes manuales.</p>
 <div class="actions">
 <button data-v1800-event="v1800-static-17">Exportar backup</button>
 <label class="u-inline-8">
@@ -172,13 +172,13 @@ Introduce solo el <b>impacto agregado 0–100</b> de las bajas confirmadas relev
 </div>
 
 <div class="u-inline-10" id="vp-test-tools">
-<div class="u-inline-11">🧪 Herramientas de prueba V2.0</div>
+<div class="u-inline-11">🧪 Herramientas de prueba V2.5</div>
 <div class="u-inline-12">
-<button id="vp-load-test" type="button">Cargar prueba V2.0</button>
+<button id="vp-load-test" type="button">Cargar prueba V2.5</button>
 <button class="secondary" id="vp-clear-test" type="button">Limpiar formulario</button>
 </div>
 <div class="small muted u-inline-13" id="vp-test-status"></div>
 </div>
 
-<script defer src="js/app-core.js?v=2000"></script><script defer src="js/v2-ui.js?v=2000"></script></body>
+<script defer src="js/app-core.js?v=2500"></script><script defer src="js/v2-ui.js?v=2500"></script><script defer src="js/v2500.js?v=2500"></script><script defer src="js/historical-db.js?v=2500"></script></body>
 </html>

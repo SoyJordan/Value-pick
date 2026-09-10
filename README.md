@@ -1,18 +1,43 @@
-# SoyJordan Picks V2.0 · build 2000
+# SoyJordan Picks V2.5.0 · build 2500
 
-Versión lista para GitHub Pages.
+Actualización evolutiva sobre V2.0 build 2000, lista para GitHub Pages.
 
-## Archivos
-- `index.html`: estructura HTML.
-- `css/styles.css`: estilos.
-- `js/app-core.js`: motor, análisis, historial, bank y persistencia.
-- `js/v2-ui.js`: combinadas flotantes y calibración V2.
-- `manifest.json` + `sw.js`: PWA.
+## Motor V2.5
+- Ventanas: Últimos 10 / Últimos 5 / condición = 50% / 30% / 20%.
+- Nivel de Equipo 0–100 también en Liga, fuera del 50/30/20.
+- Copa/interliga: Nivel de Liga + Nivel de Equipo con ajuste asimétrico y cap.
+- Fuerza de oposición ponderada 50/30/20.
+- Confirmación de λ con tiros, tiros al arco y ocasiones claras.
+- Tendencia U5 vs U10 con peso contextual pequeño.
+- Localía de competición opcional con fallback.
+- De-vig cuando existe el conjunto completo de cuotas.
+- Calibración por buckets, mercado, liga y modo; Brier y CLV.
+- Fiabilidad de mercado STATIC / BLENDED / HISTORICAL.
+- Stake con Kelly fraccionado 25% y cap absoluto 1.50% del bank.
+- Drawdown, Profit Factor, rachas, exposición y volatilidad.
+- Recalibración inmediata al liquidar apuestas.
 
-## Actualización desde V1.8.0
-La aplicación conserva las mismas claves de `localStorage`, por lo que al subirla sobre el mismo GitHub Pages mantiene los datos locales del iPhone. Antes de actualizar se recomienda exportar un backup. Los backups V1.8.0 siguen siendo importables.
+## Base Histórica SoyJordan
+Nueva sección dentro de Calibración que convierte cada análisis en una observación estructurada.
+
+- IndexedDB principal + fallback LocalStorage.
+- Vistas Partidos / Apuestas / Resultados / Comparar builds.
+- `matchId` y `betId` automáticos.
+- `modelVersion`, versiones de λ/selector/calibración y timestamps.
+- Snapshot prepartido congelado y separado de resultados reales.
+- Guarda NO BET y Top 3 candidatos para reducir selection bias.
+- Búsqueda, filtros combinables y resumen dinámico.
+- Error λ, MAE/RMSE, Brier, CLV, ROI y Profit Factor.
+- Exportación Partidos/Apuestas/Resultados CSV y base completa JSON.
+- Backup V2.5 general incluye también Base Histórica.
+- Migración automática desde registros previos; ausencias de datos se representan como `null`, no cero.
+- Paginación de 50 registros para móvil.
+- Health dashboard de cobertura del dataset y fecha de último backup.
+
+Ver `HISTORICAL_SCHEMA.md` para el esquema detallado.
+
+## Compatibilidad
+Mantiene las claves LocalStorage existentes y backups legacy en array/objeto V2.0. Los campos históricos nuevos se incorporan sin eliminar IDs antiguos.
 
 ## GitHub Pages
-Sube **el contenido de esta carpeta** a la raíz del repositorio y reemplaza los archivos anteriores. No subas la carpeta contenedora adicional.
-
-Build: 2000
+Sube el contenido de este ZIP a la raíz del repositorio. El service worker usa el cache `soyjordan-v2-5-build2500` y los assets llevan `?v=2500`. El nuevo archivo `js/historical-db.js` está incluido en el precache.
